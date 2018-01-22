@@ -23,6 +23,16 @@ GLfloat vertices[] =
 	0.5f,-0.5f,0.0f
 };
 
+GLfloat myMatrix[] =
+{
+	1.0f, 0.0f, 0.0f,0.5f,
+	0.0f, 1.0f, 0.0f,0.0f,
+	0.0f, 0.0f, 1.0f,0.0f,
+	0.0f, 0.0f, 0.0f, 1.0f
+};
+// Reference to program
+GLuint program;
+
 // vertex array object
 unsigned int vertexArrayObjID;
 
@@ -42,10 +52,11 @@ void init(void)
 
 	// Load and compile shader
 	program = loadShaders("lab1-1.vert","lab1-1.frag");
+	glUseProgram(program);
 	printError("init shader");
 
 	// Upload geometry to the GPU:
-	glColor3f(1,0,0);
+	glUniformMatrix4fv(glGetUniformLocation(program, "myMatrix"), 1, GL_TRUE, myMatrix);
 	// Allocate and activate Vertex Array Object
 	glGenVertexArrays(1, &vertexArrayObjID);
 	glBindVertexArray(vertexArrayObjID);
@@ -70,7 +81,6 @@ void display(void)
 
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT);
-
 	glBindVertexArray(vertexArrayObjID);	// Select VAO
 	glDrawArrays(GL_TRIANGLES, 0, 3);	// draw object
 

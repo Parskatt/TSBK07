@@ -13,6 +13,7 @@
 #endif
 #include "MicroGlut.h"
 #include "GL_utilities.h"
+#include <math.h>
 
 // Globals
 // Data would normally be read from files
@@ -23,6 +24,16 @@ GLfloat vertices[] =
 	0.5f,-0.5f,0.0f
 };
 
+GLfloat myMatrix[] =
+{
+	1.0f, 0.0f, 0.0f,0.5f,
+	0.0f, 1.0f, 0.0f,0.0f,
+	0.0f, 0.0f, 1.0f,0.0f,
+	0.0f, 0.0f, 0.0f, 1.0f
+};
+// Reference to program
+GLuint program;
+
 // vertex array object
 unsigned int vertexArrayObjID;
 
@@ -31,7 +42,6 @@ void init(void)
 	// vertex buffer object, used for uploading the geometry
 	unsigned int vertexBufferObjID;
 	// Reference to shader program
-	GLuint program;
 
 	dumpInfo();
 
@@ -41,11 +51,12 @@ void init(void)
 	printError("GL inits");
 
 	// Load and compile shader
-	program = loadShaders("lab1-1.vert","lab1-1.frag");
+	program = loadShaders("lab1-3.vert","lab1-3.frag");
+	glUseProgram(program);
 	printError("init shader");
 
 	// Upload geometry to the GPU:
-	glColor3f(1,0,0);
+	glUniformMatrix4fv(glGetUniformLocation(program, "myMatrix"), 1, GL_TRUE, myMatrix);
 	// Allocate and activate Vertex Array Object
 	glGenVertexArrays(1, &vertexArrayObjID);
 	glBindVertexArray(vertexArrayObjID);
@@ -63,14 +74,19 @@ void init(void)
 	printError("init arrays");
 }
 
+void OnTimer(int value)
+{
+    glutPostRedisplay();
+    glutTimerFunc(20, &OnTimer, value);
+}
 
 void display(void)
 {
 	printError("pre display");
-
+	GLfloat t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
+	glUniform1f(glGetUniformLocation(program, "t"), t);
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT);
-
 	glBindVertexArray(vertexArrayObjID);	// Select VAO
 	glDrawArrays(GL_TRIANGLES, 0, 3);	// draw object
 
@@ -85,6 +101,7 @@ int main(int argc, char *argv[])
 	glutInitContextVersion(3, 2);
 	glutCreateWindow("GL3 white triangle example");
 	glutDisplayFunc(display);
+	glutTimerFunc(20, &OnTimer, 0);
 	init();
 	glutMainLoop();
 	return 0;
