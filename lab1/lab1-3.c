@@ -31,6 +31,20 @@ GLfloat myMatrix[] =
 	0.0f, 0.0f, 1.0f,0.0f,
 	0.0f, 0.0f, 0.0f, 1.0f
 };
+GLfloat myRotMatrix[] =
+{
+	1.0f, 0.0f, 0.0f,0.0f,
+	0.0f, 1.0f, 0.0f,0.0f,
+	0.0f, 0.0f, 1.0f,0.0f,
+	0.0f, 0.0f, 0.0f, 1.0f
+};
+GLfloat myTranslationMatrix[] =
+{
+	1.0f, 0.0f, 0.0f,0.0f,
+	0.0f, 1.0f, 0.0f,0.0f,
+	0.0f, 0.0f, 1.0f,0.0f,
+	0.0f, 0.0f, 0.0f, 1.0f
+};
 // Reference to program
 GLuint program;
 
@@ -73,6 +87,22 @@ void init(void)
 
 	printError("init arrays");
 }
+void SetRotationMatrix(GLfloat t, GLfloat *m)
+{
+m[0] = cos(t); m[1] = -sin(t); m[2] = 0; m[3] = 0.0;
+m[4] = sin(t); m[5] = cos(t); m[6] = 0; m[7] = 0.0;
+m[8] = 0; m[9] = 0; m[10] = 1.0; m[11] = 0.0;
+m[12] = 0.0; m[13] = 0.0; m[14] = 0.0; m[15] = 1.0;
+}
+
+void SetTranslationMatrix(GLfloat t, GLfloat *m)
+{
+m[0] = 1.0; m[1] = 0.0; m[2] = 0; m[3] = sin(t);
+m[4] = 0.0; m[5] = 1.0; m[6] = 0; m[7] = cos(2*t);
+m[8] = 0; m[9] = 0; m[10] = 1.0; m[11] = 0;
+m[12] = 0.0; m[13] = 0.0; m[14] = 0.0; m[15] = 1.0;
+}
+
 
 void OnTimer(int value)
 {
@@ -85,6 +115,10 @@ void display(void)
 	printError("pre display");
 	GLfloat t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
 	glUniform1f(glGetUniformLocation(program, "t"), t);
+	SetRotationMatrix(t/100.0, myRotMatrix);
+	SetTranslationMatrix(t/100.0, myTranslationMatrix);
+	glUniformMatrix4fv(glGetUniformLocation(program, "myRotMatrix"), 1, GL_TRUE, myRotMatrix);
+	glUniformMatrix4fv(glGetUniformLocation(program, "myTranslationMatrix"), 1, GL_TRUE, myTranslationMatrix);
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT);
 	glBindVertexArray(vertexArrayObjID);	// Select VAO
