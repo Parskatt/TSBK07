@@ -19,7 +19,7 @@
 
 //Defines
 #define near 1.0
-#define far 40.0
+#define far 30.0
 #define right 0.5
 #define left -0.5
 #define top 0.5
@@ -50,23 +50,30 @@ GLfloat projectionMatrix[] =
   0.0f, 0.0f, -(far + near)/(far - near), -2*far*near/(far - near),
   0.0f, 0.0f, -1.0f, 0.0f
 };
-GLfloat a, b, a_old, b_old = 0.0;
-vec3 cam_pos;
-mat4 rot, rot2, trans, total, worldToViewMatrix;
 
-Model *blade1;
-Model *blade2;
-Model *blade3;
-Model *blade4;
-Model *walls;
-Model *roof;
-Model *balcony;
+mat4 rot, trans, total, worldToViewMatrix;
 
+Model *m;
+unsigned int bunnyVertexArrayObjID;
+unsigned int bunnyVertexBufferObjID;
+unsigned int bunnyIndexBufferObjID;
+unsigned int bunnyNormalBufferObjID;
+unsigned int bunnyTexCoordBufferObjID;
+Model *m2;
+unsigned int bilVertexArrayObjID;
+unsigned int bilVertexBufferObjID;
+unsigned int bilIndexBufferObjID;
+unsigned int bilNormalBufferObjID;
+unsigned int bilTexCoordBufferObjID;
 void LoadTGATextureSimple(char *filename, GLuint *tex);
 // Reference to program
 GLuint program;
 GLuint myTex;
 GLuint myTex2;
+
+// vertex array object
+unsigned int vertexArrayObjID;
+unsigned int vertexArrayObjID2;
 void init(void)
 {
 	dumpInfo();
@@ -75,28 +82,24 @@ void init(void)
 	// GL inits
 	glClearColor(0.9,0.8,0.5,0);
 	printError("GL inits");
-	cam_pos = SetVector(0.0, 0.0, 25.0);
+
 	// Load and compile shader
-	program = loadShaders("lab3-2.vert","lab3-2.frag");
+	program = loadShaders("lab2-7.vert","lab2-7.frag");
 	glUseProgram(program);
 	printError("init shader");
-	worldToViewMatrix = lookAt(0, 0, 25, 0,0,0, 0,1,0);
 
 	// Upload geometry to the GPU:
-	blade1 = LoadModelPlus("windmill/blade.obj");
-	blade2 = LoadModelPlus("windmill/blade.obj");
-	blade3 = LoadModelPlus("windmill/blade.obj");
-	blade4 = LoadModelPlus("windmill/blade.obj");
-  walls = LoadModelPlus("windmill/windmill-walls.obj");
-	balcony = LoadModelPlus("windmill/windmill-balcony.obj");
-	roof = LoadModelPlus("windmill/windmill-roof.obj");
-	//glActiveTexture(GL_TEXTURE0);
+	m = LoadModelPlus("bunnyplus.obj");
+  m2 = LoadModelPlus("bilskiss.obj");
 
   //Frustum matrix
   glUniformMatrix4fv(glGetUniformLocation(program, "projMatrix"), 1, GL_TRUE, projectionMatrix);
+	// load texture
+  LoadTGATextureSimple("maskros512.tga", &myTex);
+	LoadTGATextureSimple("bilskissred.tga", &myTex2);
+  glActiveTexture(GL_TEXTURE0);   // activate texture
 	printError("init arrays");
 	// End of upload of geometry
-
 }
 void SetRotationMatrix(GLfloat t, GLfloat *m)
 {
@@ -133,93 +136,40 @@ void display(void)
 
 	printError("pre display");
 	GLfloat t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
-  //worldToViewMatrix = lookAt(25*sin(t/1000.0), 0, 25*cos(t/1000.0), 0,0,0, 0,1,0);
+  worldToViewMatrix = lookAt(10*sin(t/1000), 5, -10*cos(t/1000), 0,0,0, 0,1,0);
   glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 
   //For Model 1
-  trans = T(5, 4.2, 0);
-  rot = Ry(3.14);
-	rot2 = Rx(0+t/500.0);
-  total = Mult(trans,Mult(rot,rot2));
+  glBindTexture(GL_TEXTURE_2D, myTex);
+  trans = T(0, 0, -2);
+  rot = Ry(0);//t/1000.0);
+  total = Mult(trans,rot);
 	glUniform1f(glGetUniformLocation(program, "t"), t);
 	glUniform1i(glGetUniformLocation(program, "texUnit"), 0);
 	SetRotationMatrix2(t/1000.0, myRotMatrix2);
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
-	DrawModel(blade1, program, "in_Position", "inNormal", "inTexCoord");
+	//glBindVertexArray(bunnyVertexArrayObjID);    // Select VAO
 
+	DrawModel(m, program, "in_Position", "inNormal", "inTexCoord");
 
-  rot = Ry(3.14);
-	rot2 = Rx(3.14*0.5+t/500.0);
-  total = Mult(Mult(trans,rot), rot2);
-	SetRotationMatrix2(t/1000.0, myRotMatrix2);
-	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
-	DrawModel(blade2, program, "in_Position", "inNormal", "inTexCoord");
-
-
-  rot = Ry(3.14);
-	rot2 = Rx(3.14+t/500.0);
-  total = Mult(trans,Mult(rot, rot2));
-	SetRotationMatrix2(t/1000.0, myRotMatrix2);
-	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
-	DrawModel(blade3, program, "in_Position", "inNormal", "inTexCoord");
-
-
-	rot = Ry(3.14);
-	rot2 = Rx(3.14*1.5+t/500.0);
-	total = Mult(Mult(trans,rot), rot2);
-	SetRotationMatrix2(t/1000.0, myRotMatrix2);
-	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
-	DrawModel(blade4, program, "in_Position", "inNormal", "inTexCoord");
-
+  glBindTexture(GL_TEXTURE_2D, myTex2);
   //For Model 2
-  trans = T(0, -5, 0);
+  trans = T(0, -2, -5);
   rot = Ry(0);
   total = Mult(trans,rot);
+	//glUniform1i(glGetUniformLocation(program, "texUnit"), 0);
 	SetRotationMatrix2(t/1000.0, myRotMatrix2);
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
-	DrawModel(walls, program, "in_Position", "inNormal", "inTexCoord");
+	//dont clear the screen
+	//glBindVertexArray(bilVertexArrayObjID);    // Select VAO
+  //glActiveTexture(GL_TEXTURE1);   // activate texture
 
-	// For model 3
-	trans = T(0, -5, 0);
-	rot = Ry(0);
-	total = Mult(trans,rot);
-	SetRotationMatrix2(t/1000.0, myRotMatrix2);
-	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
-	DrawModel(roof, program, "in_Position", "inNormal", "inTexCoord");
+	DrawModel(m2, program, "in_Position", "inNormal", "inTexCoord");
 
-	// For model 4
-	trans = T(0, -5, 0);
-	rot = Ry(0);
-	total = Mult(trans,rot);
-	SetRotationMatrix2(t/1000.0, myRotMatrix2);
-	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
-	DrawModel(balcony, program, "in_Position", "inNormal", "inTexCoord");
+
 
 	printError("display");
 	glutSwapBuffers();
-}
-
-void mouse(int x, int y)
-{
-	vec3 p;
-	mat4 m;
-	b_old = b;
-	a_old = a;
-	b = x * 1.0;
-	a = y * 1.0;
-
-	p.y = b_old-b;
-	p.x = -(a-a_old);
-	p.z = 0;
-
-	mat3 wv3 = mat4tomat3(worldToViewMatrix);
-	p = MultMat3Vec3(InvertMat3(wv3), p);
-
-	m = ArbRotate(p, sqrt(p.x*p.x + p.y*p.y) / 50.0);
-	cam_pos = MultMat3Vec3(mat4tomat3(m),cam_pos);
-	worldToViewMatrix = lookAt(cam_pos.x,cam_pos.y,cam_pos.z, 0,0,0, 0,1,0);
-	glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
-	glutPostRedisplay();
 }
 
 int main(int argc, char *argv[])
@@ -229,7 +179,6 @@ int main(int argc, char *argv[])
 	glutCreateWindow("GL3 triangle example");
 	glutDisplayFunc(display);
 	glutTimerFunc(20, &OnTimer, 0);
-	glutPassiveMotionFunc(mouse);
 	init();
 	glutMainLoop();
 	return 0;
