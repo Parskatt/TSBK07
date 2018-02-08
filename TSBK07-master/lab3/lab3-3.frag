@@ -11,5 +11,5 @@ uniform float t;
 void main(void)
 {
 	vec4 a = texture(texUnit, texCoord);
-	out_Color = vec4(exColor,1.0);
+	out_Color = a*vec4(exColor,1.0);
 }

@@ -1,4 +1,4 @@
-// Lab 2-1.
+// Lab 2-3.
 // This is the same as the first simple example in the course book,
 // but with a few error checks.
 // Remember to copy your file to a new on appropriate places during the lab so you keep old results.
@@ -16,10 +16,13 @@
 #include <math.h>
 #include "loadobj.h"
 #include "VectorUtils3.h"
+#include "LoadTGA.h"
+#include <stdio.h>
+#include <string.h>
 
 //Defines
 #define near 1.0
-#define far 40.0
+#define far 200.0
 #define right 0.5
 #define left -0.5
 #define top 0.5
@@ -28,6 +31,23 @@
 
 // Globals
 // Data would normally be read from files
+GLfloat a, b, prevx, prevy = 0.0;
+vec3 cam_pos;
+mat4 rot, rot2, trans, total, worldToViewMatrix;
+GLuint program, program_skynet;
+GLuint groundTex;
+GLuint skyTex;
+
+Model *blade1;
+Model *blade2;
+Model *blade3;
+Model *blade4;
+Model *walls;
+Model *roof;
+Model *balcony;
+Model *ground;
+Model *skybox;
+
 
 GLfloat myRotMatrix[] =
 {
@@ -50,41 +70,34 @@ GLfloat projectionMatrix[] =
   0.0f, 0.0f, -(far + near)/(far - near), -2*far*near/(far - near),
   0.0f, 0.0f, -1.0f, 0.0f
 };
-GLfloat a, b, prevx, prevy = 0.0;
-vec3 cam_pos;
-mat4 rot, rot2, trans, total, worldToViewMatrix;
 
-Model *blade1;
-Model *blade2;
-Model *blade3;
-Model *blade4;
-Model *walls;
-Model *roof;
-Model *balcony;
-Model *ground;
-Model *skybox;
+
+#define TEXTURE_OFFSET 0 //Select texture set by setting this constant to 0
 
 void LoadTGATextureSimple(char *filename, GLuint *tex);
-// Reference to program
-GLuint program;
-GLuint program_skynet;
-GLuint groundTex;
-GLuint skyTex;
+
 
 void init(void)
 {
 	dumpInfo();
   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
 
 	// GL inits
-	glClearColor(0.9,0.8,0.5,0);
+	glClearColor(0.9,0.8,0.5,0); //makes the yellow ground, "sand"
 	printError("GL inits");
 	cam_pos = SetVector(0.0, 0.0, 25.0);
 	// Load and compile shader
-	program = loadShaders("lab3-2.vert","lab3-2.frag");
+
 	program_skynet = loadShaders("lab3-3skybox.vert","lab3-3skybox.frag");
+	glUseProgram(program_skynet);
+	skybox = LoadModelPlus("skybox.obj");
+	LoadTGATextureSimple("SkyBox512.tga", &skyTex);
+	glUniformMatrix4fv(glGetUniformLocation(program_skynet, "projMatrix"), 1, GL_TRUE, projectionMatrix); //edit: different projmatrices
+	glUniform1i(glGetUniformLocation(program_skynet, "skyTex"), 0);
 	printError("init shader");
+
+	program = loadShaders("lab3-3.vert","lab3-3.frag");
 	worldToViewMatrix = lookAt(0, 0, 25, 0,0,0, 0,1,0);
 
 	// Upload geometry to the GPU:
@@ -96,14 +109,16 @@ void init(void)
 	balcony = LoadModelPlus("windmill/windmill-balcony.obj");
 	roof = LoadModelPlus("windmill/windmill-roof.obj");
 	ground = LoadModelPlus("ground.obj");
-	skybox = LoadModelPlus("skybox.obj");
 
-	glActiveTexture(GL_TEXTURE0);
+
+	// Load textures
 	LoadTGATextureSimple("grass.tga", &groundTex);
-  LoadTGATextureSimple("SkyBox512.tga", &skyTex);
+
+
   //Frustum matrix
   glUniformMatrix4fv(glGetUniformLocation(program, "projMatrix"), 1, GL_TRUE, projectionMatrix);
-	glUniformMatrix4fv(glGetUniformLocation(program_skynet, "projMatrix"), 1, GL_TRUE, projectionMatrix);
+	glUniform1i(glGetUniformLocation(program, "groundTex"), 0);
+
 	printError("init arrays");
 	// End of upload of geometry
 
@@ -120,33 +135,44 @@ void display(void)
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	printError("pre display");
-	//Make the uniforms some of them
+
+	//Make the time uniform
 	GLfloat t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
+	glUniform1f(glGetUniformLocation(program, "t"), t);
+
 	//Skybox Rendering
+	glDisable(GL_DEPTH_TEST);
 	glUseProgram(program_skynet);
+
+	//worldToViewMatrix
+	glUniformMatrix4fv(glGetUniformLocation(program_skynet, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
+
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, skyTex);
-  glUniformMatrix4fv(glGetUniformLocation(program_skynet, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
+
 	trans = T(cam_pos.x,cam_pos.y,cam_pos.z);
 	rot = Ry(0);
 	total = Mult(trans,rot);
 	glUniformMatrix4fv(glGetUniformLocation(program_skynet, "mdlMatrix"), 1, GL_TRUE, total.m);
-	glUniform1i(glGetUniformLocation(program_skynet, "texUnit"), 0);
-	glDisable(GL_DEPTH_TEST);
+
+
 	DrawModel(skybox, program_skynet, "in_Position", NULL, "inTexCoord");
-	glEnable(GL_DEPTH_TEST);
+
 	printError("display");
 
 	// Ground model
-	glUseProgram(program);
-	glUniform1f(glGetUniformLocation(program, "t"), t);
-	glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
+	glEnable(GL_DEPTH_TEST);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, groundTex);
+
+	glUseProgram(program);
+	glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 
 	trans = T(0,-5,0);
 	rot = Ry(0);
 	total = Mult(trans,rot);
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
-	glUniform1i(glGetUniformLocation(program, "texUnit"), 0);
+
 	DrawModel(ground, program, "in_Position", "inNormal", "inTexCoord");
 	printError("display");
 
