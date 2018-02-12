@@ -32,21 +32,13 @@
 // Globals
 // Data would normally be read from files
 GLfloat a, b, prevx, prevy = 0.0;
-vec3 cam_pos;
+vec3 cam_pos, cam_dir, v;
 mat4 rot, rot2, trans, total, worldToViewMatrix;
 GLuint program, program_skynet;
 GLuint groundTex;
 GLuint skyTex;
 
-Model *blade1;
-Model *blade2;
-Model *blade3;
-Model *blade4;
-Model *walls;
-Model *roof;
-Model *balcony;
-Model *ground;
-Model *skybox;
+Model *blade1, *blade2, *blade3, *blade4, *walls, *roof, *balcony, *ground, *skybox;
 
 
 GLfloat myRotMatrix[] =
@@ -87,6 +79,8 @@ void init(void)
 	glClearColor(0.9,0.8,0.5,0); //makes the yellow ground, "sand"
 	printError("GL inits");
 	cam_pos = SetVector(0.0, 0.0, 25.0);
+	cam_dir = SetVector(0.0, 0.0, 0.0);
+	v = SetVector(0.0, 0.0, 0.0);
 	// Load and compile shader
 
 	program_skynet = loadShaders("lab3-3skybox.vert","lab3-3skybox.frag");
@@ -98,7 +92,7 @@ void init(void)
 	printError("init shader");
 
 	program = loadShaders("lab3-3.vert","lab3-3.frag");
-	worldToViewMatrix = lookAt(0, 0, 25, 0,0,0, 0,1,0);
+	worldToViewMatrix = lookAt(0, 0, 25, cam_dir.x, cam_dir.y, cam_dir.z, 0,1,0);
 
 	// Upload geometry to the GPU:
 	blade1 = LoadModelPlus("windmill/blade.obj");
@@ -251,7 +245,29 @@ void mouseDragged(int x, int y)
 	prevy = y;
 	glutPostRedisplay();
 }
-
+void keyboard(unsigned char c, int x, int y)
+{
+	switch (c)
+	{
+	case 27:
+		exit(0);
+		break;
+	case 'w':
+		v = SetVector(cam_dir.x - cam_pos.x, cam_dir.y - cam_pos.y, cam_dir.z - cam_pos.z);
+		cam_pos = SetVector(cam_pos.x + 0.1*v.x, cam_pos.y + 0.1*v.y, cam_pos.z + 0.1*v.z);
+		glutPostRedisplay();
+		break;
+	case 's':
+		glutPostRedisplay();
+		break;
+	case 'a':
+		glutPostRedisplay();
+		break;
+	case 'd':
+		glutPostRedisplay();
+		break;
+	}
+}
 int main(int argc, char *argv[])
 {
 	glutInit(&argc, argv);
@@ -261,6 +277,7 @@ int main(int argc, char *argv[])
 	glutTimerFunc(20, &OnTimer, 0);
 	glutMouseFunc(mouse);
 	glutMotionFunc(mouseDragged);
+	glutKeyboardFunc(keyboard);
 	init();
 	glutMainLoop();
 	return 0;
