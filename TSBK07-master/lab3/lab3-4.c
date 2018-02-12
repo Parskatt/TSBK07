@@ -35,10 +35,9 @@ GLfloat a, b, prevx, prevy = 0.0;
 vec3 cam_pos, cam_dir, v;
 mat4 rot, rot2, trans, total, worldToViewMatrix;
 GLuint program, program_skynet;
-GLuint groundTex, skyTex;
+GLuint groundTex, skyTex, maskrosTex;
 
-Model *blade1, *blade2, *blade3, *blade4, *walls, *roof, *balcony, *ground, *skybox;
-
+Model *blade1, *blade2, *blade3, *blade4, *walls, *roof, *balcony, *ground, *skybox, *bunny;
 
 GLfloat myRotMatrix[] =
 {
@@ -62,6 +61,26 @@ GLfloat projectionMatrix[] =
   0.0f, 0.0f, -1.0f, 0.0f
 };
 
+Point3D lightSourcesColorsArr[] = { {1.0f, 0.0f, 0.0f}, // Red light
+
+                                 {0.0f, 1.0f, 0.0f}, // Green light
+
+                                 {0.0f, 0.0f, 1.0f}, // Blue light
+
+                                 {1.0f, 1.0f, 1.0f} }; // White light
+
+Point3D lightSourcesDirectionsPositions[] = { {10.0f, 5.0f, 0.0f}, // Red light, positional
+
+	                                        {0.0f, 5.0f, 10.0f}, // Green light, positional
+
+	                                        {-1.0f, 0.0f, 0.0f}, // Blue light along X
+
+	                                        {0.0f, 0.0f, -1.0f} }; // White light along Z
+
+
+const GLfloat specularExponent[] = {100.0, 200.0, 60.0, 50.0, 300.0, 150.0};
+
+GLint isDirectional[] = {0,0,1,1};
 
 #define TEXTURE_OFFSET 0 //Select texture set by setting this constant to 0
 
@@ -82,7 +101,7 @@ void init(void)
 	v = SetVector(0.0, 0.0, 0.0);
 	// Load and compile shader
 
-	program_skynet = loadShaders("lab3-3skybox.vert","lab3-3skybox.frag");
+	program_skynet = loadShaders("lab3-4skybox.vert","lab3-4skybox.frag");
 	glUseProgram(program_skynet);
 	skybox = LoadModelPlus("skybox.obj");
 	LoadTGATextureSimple("SkyBox512.tga", &skyTex);
@@ -90,7 +109,7 @@ void init(void)
 	glUniform1i(glGetUniformLocation(program_skynet, "skyTex"), 0);
 	printError("init shader");
 
-	program = loadShaders("lab3-3.vert","lab3-3.frag");
+	program = loadShaders("lab3-4.vert","lab3-4.frag");
 	worldToViewMatrix = lookAt(0, 0, 25, cam_dir.x, cam_dir.y, cam_dir.z, 0,1,0);
 
 	// Upload geometry to the GPU:
@@ -102,15 +121,17 @@ void init(void)
 	balcony = LoadModelPlus("windmill/windmill-balcony.obj");
 	roof = LoadModelPlus("windmill/windmill-roof.obj");
 	ground = LoadModelPlus("ground.obj");
+	bunny = LoadModelPlus("bunny.obj");
 
 
 	// Load textures
 	LoadTGATextureSimple("grass.tga", &groundTex);
+	LoadTGATextureSimple("maskros512.tga", &maskrosTex);
 
 
   //Frustum matrix
   glUniformMatrix4fv(glGetUniformLocation(program, "projMatrix"), 1, GL_TRUE, projectionMatrix);
-	glUniform1i(glGetUniformLocation(program, "groundTex"), 0);
+	//glUniform1i(glGetUniformLocation(program, "groundTex"), 0);
 
 	printError("init arrays");
 	// End of upload of geometry
@@ -132,6 +153,9 @@ void display(void)
 	//Make the time uniform
 	GLfloat t = (GLfloat)glutGet(GLUT_ELAPSED_TIME);
 	glUniform1f(glGetUniformLocation(program, "t"), t);
+	glUniform3fv(glGetUniformLocation(program, "lightSourcesDirPosArr"), 4, &lightSourcesDirectionsPositions[0].x);
+	glUniform3fv(glGetUniformLocation(program, "lightSourcesColorArr"), 4, &lightSourcesColorsArr[0].x);
+	glUniform1iv(glGetUniformLocation(program, "isDirectional"), 4, isDirectional);
 
 	//Skybox Rendering
 	glDisable(GL_DEPTH_TEST);
@@ -154,6 +178,9 @@ void display(void)
 	printError("display");
 
 	// Ground model
+	glUniform3f(glGetUniformLocation(program, "myPos"), cam_pos.x, cam_pos.y, cam_pos.z);
+	glUniform1fv(glGetUniformLocation(program, "specularExponent"), 1, &specularExponent[0]);
+
 	glEnable(GL_DEPTH_TEST);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, groundTex);
@@ -171,6 +198,7 @@ void display(void)
 
 
   //Windmill rendering
+	glUniform1fv(glGetUniformLocation(program, "specularExponent"), 1, &specularExponent[1]);
   trans = T(5, 4.2, 0);
   rot = Ry(3.14);
 	rot2 = Rx(0+t/500.0);
@@ -180,19 +208,16 @@ void display(void)
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
 	DrawModel(blade1, program, "in_Position", "inNormal", "inTexCoord");
 
-  rot = Ry(3.14);
 	rot2 = Rx(3.14*0.5+t/500.0);
   total = Mult(Mult(trans,rot), rot2);
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
 	DrawModel(blade2, program, "in_Position", "inNormal", "inTexCoord");
 
-  rot = Ry(3.14);
 	rot2 = Rx(3.14+t/500.0);
   total = Mult(trans,Mult(rot, rot2));
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
 	DrawModel(blade3, program, "in_Position", "inNormal", "inTexCoord");
 
-	rot = Ry(3.14);
 	rot2 = Rx(3.14*1.5+t/500.0);
 	total = Mult(Mult(trans,rot), rot2);
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
@@ -215,7 +240,22 @@ void display(void)
 	total = Mult(trans,rot);
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
 	DrawModel(balcony, program, "in_Position", "inNormal", "inTexCoord");
+	//end of windmill
+
+	//Bunny rendering
+	glUniform1fv(glGetUniformLocation(program, "specularExponent"), 1, &specularExponent[1]);
+	glBindTexture(GL_TEXTURE_2D, maskrosTex);
+	glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
+
+	trans = T(-7,-4,0);
+	rot = Ry(0);
+	total = Mult(trans,rot);
+	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
+
+	DrawModel(bunny, program, "in_Position", "inNormal", "inTexCoord");
+	printError("display");
 	glutSwapBuffers();
+
 }
 
 void mouse(int button, int state, int x, int y)
