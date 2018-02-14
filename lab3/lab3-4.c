@@ -103,7 +103,7 @@ void init(void)
 
 	program_skynet = loadShaders("lab3-4skybox.vert","lab3-4skybox.frag");
 	glUseProgram(program_skynet);
-	skybox = LoadModelPlus("skybox.obj");
+	skybox = LoadModelPlus("models/skybox.obj");
 	LoadTGATextureSimple("SkyBox512.tga", &skyTex);
 	glUniformMatrix4fv(glGetUniformLocation(program_skynet, "projMatrix"), 1, GL_TRUE, projectionMatrix); //edit: different projmatrices
 	glUniform1i(glGetUniformLocation(program_skynet, "skyTex"), 0);
@@ -120,8 +120,8 @@ void init(void)
   walls = LoadModelPlus("windmill/windmill-walls.obj");
 	balcony = LoadModelPlus("windmill/windmill-balcony.obj");
 	roof = LoadModelPlus("windmill/windmill-roof.obj");
-	ground = LoadModelPlus("ground.obj");
-	bunny = LoadModelPlus("bunny.obj");
+	ground = LoadModelPlus("models/ground.obj");
+	bunny = LoadModelPlus("models/bunny.obj");
 
 
 	// Load textures
@@ -278,7 +278,7 @@ void mouseDragged(int x, int y)
 	p = MultMat3Vec3(wv3, p); //InvertMat3(
 	m = ArbRotate(p, sqrt(p.x*p.x + p.y*p.y) / 50.0);
 	temp = SetVector(cam_dir.x - cam_pos.x, cam_dir.y - cam_pos.y,cam_dir.z - cam_pos.z);
-	cam_dir = MultMat3Vec3(mat4tomat3(m),temp);
+	cam_dir = VectorAdd(MultMat3Vec3(mat4tomat3(m),temp),cam_pos);
 	worldToViewMatrix = lookAt(cam_pos.x,cam_pos.y,cam_pos.z, cam_dir.x,cam_dir.y,cam_dir.z,0,1,0);//cam_dir.x, cam_dir.y, cam_dir.z, 0,1,0);
 	glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 	prevx = x;
@@ -295,8 +295,8 @@ void keyboard(unsigned char c, int x, int y)
 		break;
 	case 'w':
 		v = SetVector(cam_dir.x - cam_pos.x, cam_dir.y - cam_pos.y, cam_dir.z - cam_pos.z);
-		cam_pos = SetVector(cam_pos.x + 0.0001*v.x, cam_pos.y + 0.0001*v.y, cam_pos.z + 0.0001*v.z);
-		cam_dir = SetVector(cam_dir.x + 0.0001*v.x, cam_dir.y + 0.0001*v.y, cam_dir.z + 0.0001*v.z);
+		cam_pos = SetVector(cam_pos.x + 0.01*v.x, cam_pos.y + 0.01*v.y, cam_pos.z + 0.01*v.z);
+		cam_dir = SetVector(cam_dir.x + 0.01*v.x, cam_dir.y + 0.01*v.y, cam_dir.z + 0.01*v.z);
 		worldToViewMatrix = lookAt(cam_pos.x,cam_pos.y,cam_pos.z, cam_dir.x,cam_dir.y,cam_dir.z,0,1,0);
 		glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 		glUniformMatrix4fv(glGetUniformLocation(program_skynet, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
@@ -304,8 +304,8 @@ void keyboard(unsigned char c, int x, int y)
 		break;
 	case 's':
 		v = SetVector(cam_pos.x-cam_dir.x,cam_pos.y - cam_dir.y, cam_pos.z - cam_dir.z);
-		cam_pos = SetVector(cam_pos.x + 0.0001*v.x, cam_pos.y + 0.0001*v.y, cam_pos.z + 0.0001*v.z);
-		cam_dir = SetVector(cam_dir.x + 0.0001*v.x, cam_dir.y + 0.0001*v.y, cam_dir.z + 0.0001*v.z);
+		cam_pos = SetVector(cam_pos.x + 0.01*v.x, cam_pos.y + 0.01*v.y, cam_pos.z + 0.01*v.z);
+		cam_dir = SetVector(cam_dir.x + 0.01*v.x, cam_dir.y + 0.01*v.y, cam_dir.z + 0.01*v.z);
 		worldToViewMatrix = lookAt(cam_pos.x,cam_pos.y,cam_pos.z, cam_dir.x,cam_dir.y,cam_dir.z,0,1,0);
 		glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 		glUniformMatrix4fv(glGetUniformLocation(program_skynet, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
