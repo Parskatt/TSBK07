@@ -300,8 +300,7 @@ void mouseDragged(int x, int y)
 
 void keyboard(unsigned char c, int x, int y)
 {
-	float a = 0.05;
-	float b = 0.5;
+	float a = 0.1;
 
 	switch (c)
 	{
@@ -310,8 +309,10 @@ void keyboard(unsigned char c, int x, int y)
 		break;
 	case 'w':
 		v = SetVector(cam_pos.x-cam_dir.x,cam_pos.y - cam_dir.y, cam_pos.z - cam_dir.z);
-		cam_pos = SetVector(cam_pos.x - a*v.x, cam_pos.y, cam_pos.z - a*v.z);
-		cam_dir = SetVector(cam_dir.x - a*v.x, cam_dir.y, cam_dir.z - a*v.z);
+		vec3 front_vec = SetVector(0,0,-1);
+		vec3 front_rot = MultMat3Vec3(TransposeMat3(mat4tomat3(worldToViewMatrix)),front_vec);
+		cam_pos = SetVector(cam_pos.x +a*front_rot.x,cam_pos.y + a*front_rot.y,cam_pos.z + a*front_rot.z);//- b*v.x, cam_pos.y, cam_pos.z+b*v.z);
+		cam_dir = SetVector(cam_dir.x +a*front_rot.x,cam_dir.y + a*front_rot.y,cam_dir.z + a*front_rot.z);
 		worldToViewMatrix = lookAt(cam_pos.x,cam_pos.y,cam_pos.z, cam_dir.x,cam_dir.y,cam_dir.z,0,1,0);
 		glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 		glUniformMatrix4fv(glGetUniformLocation(program_skynet, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
@@ -319,8 +320,10 @@ void keyboard(unsigned char c, int x, int y)
 		break;
 	case 's':
 		v = SetVector(cam_pos.x-cam_dir.x,cam_pos.y - cam_dir.y, cam_pos.z - cam_dir.z);
-		cam_pos = SetVector(cam_pos.x + a*v.x, cam_pos.y, cam_pos.z + a*v.z);
-		cam_dir = SetVector(cam_dir.x + a*v.x, cam_dir.y, cam_dir.z + a*v.z);
+		vec3 back_vec = SetVector(0,0,1);
+		vec3 back_rot = MultMat3Vec3(TransposeMat3(mat4tomat3(worldToViewMatrix)),back_vec);
+		cam_pos = SetVector(cam_pos.x +a*back_rot.x,cam_pos.y + a*back_rot.y,cam_pos.z + a*back_rot.z);//- b*v.x, cam_pos.y, cam_pos.z+b*v.z);
+		cam_dir = SetVector(cam_dir.x +a*back_rot.x,cam_dir.y + a*back_rot.y,cam_dir.z + a*back_rot.z);
 		worldToViewMatrix = lookAt(cam_pos.x,cam_pos.y,cam_pos.z, cam_dir.x,cam_dir.y,cam_dir.z,0,1,0);
 		glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 		glUniformMatrix4fv(glGetUniformLocation(program_skynet, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
@@ -328,17 +331,21 @@ void keyboard(unsigned char c, int x, int y)
 		break;
 	case 'a':
 		v = SetVector(cam_pos.x-cam_dir.x,cam_pos.y - cam_dir.y, cam_pos.z - cam_dir.z);
-		cam_pos = SetVector(cam_pos.x - b*v.x, cam_pos.y, cam_pos.z);
-		cam_dir = SetVector(cam_dir.x - b*v.x, cam_dir.y, cam_dir.z);
+		vec3 left_vec = SetVector(-1,0,0);
+		vec3 left_rot = MultMat3Vec3(TransposeMat3(mat4tomat3(worldToViewMatrix)),left_vec);
+		cam_pos = SetVector(cam_pos.x +a*left_rot.x,cam_pos.y + a*left_rot.y,cam_pos.z + a*left_rot.z);//- b*v.x, cam_pos.y, cam_pos.z+b*v.z);
+		cam_dir = SetVector(cam_dir.x +a*left_rot.x,cam_dir.y + a*left_rot.y,cam_dir.z + a*left_rot.z);//-
 		worldToViewMatrix = lookAt(cam_pos.x,cam_pos.y,cam_pos.z, cam_dir.x,cam_dir.y,cam_dir.z,0,1,0);
 		glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 		glUniformMatrix4fv(glGetUniformLocation(program_skynet, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 		glutPostRedisplay();
 		break;
 	case 'd':
-		v = SetVector(cam_pos.x-cam_dir.x, cam_pos.y - cam_dir.y, cam_pos.z - cam_dir.z);
-		cam_pos = SetVector(cam_pos.x + b*v.x, cam_pos.y, cam_pos.z);
-		cam_dir = SetVector(cam_dir.x + b*v.x, cam_dir.y, cam_dir.z);
+		v = SetVector(cam_pos.x-cam_dir.x,cam_pos.y - cam_dir.y, cam_pos.z - cam_dir.z);
+		vec3 right_vec = SetVector(1,0,0);
+		vec3 right_rot = MultMat3Vec3(TransposeMat3(mat4tomat3(worldToViewMatrix)),right_vec);
+		cam_pos = SetVector(cam_pos.x +a*right_rot.x,cam_pos.y + a*right_rot.y,cam_pos.z + a*right_rot.z);//- b*v.x, cam_pos.y, cam_pos.z+b*v.z);
+		cam_dir = SetVector(cam_dir.x +a*right_rot.x,cam_dir.y + a*right_rot.y,cam_dir.z + a*right_rot.z);
 		worldToViewMatrix = lookAt(cam_pos.x,cam_pos.y,cam_pos.z, cam_dir.x,cam_dir.y,cam_dir.z,0,1,0);
 		glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 		glUniformMatrix4fv(glGetUniformLocation(program_skynet, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
