@@ -14,14 +14,16 @@ uniform bool isDirectional[4];
 uniform sampler2D texUnit;
 out vec2 texCoord;
 out vec3 outNormal;
-out vec3 light;
+//out vec3 light;
 out vec3 surf;
+out vec4 surface_position;
 
 void main(void)
 {
 	surf = vec3(camMatrix*mdlMatrix * vec4(in_Position, 1.0));
-	light = mat3(camMatrix)*normalize(vec3(-3, 10, -3));
+	//light = mat3(camMatrix)*normalize(vec3(-3, 10, -3));
 	texCoord = inTexCoord;
 	outNormal = mat3(camMatrix)*mat3(mdlMatrix) * inNormal;
+	surface_position = mdlMatrix*vec4(in_Position, 1.0);
 	gl_Position = projMatrix*camMatrix*mdlMatrix*vec4(in_Position, 1.0);
 }

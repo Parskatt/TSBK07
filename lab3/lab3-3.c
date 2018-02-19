@@ -101,7 +101,7 @@ void init(void)
   walls = LoadModelPlus("windmill/windmill-walls.obj");
 	balcony = LoadModelPlus("windmill/windmill-balcony.obj");
 	roof = LoadModelPlus("windmill/windmill-roof.obj");
-	ground = LoadModelPlus("ground.obj");
+	ground = LoadModelPlus("models/ground.obj");
 
 
 	// Load textures

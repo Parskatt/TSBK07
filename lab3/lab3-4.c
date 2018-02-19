@@ -32,7 +32,7 @@
 // Globals
 // Data would normally be read from files
 GLfloat a, b, prevx, prevy = 0.0;
-vec3 cam_pos, cam_dir, v;
+vec3 cam_pos, cam_dir, cam_up, v;
 mat4 rot, rot2, trans, scale, total, worldToViewMatrix;
 GLuint program, program_skynet;
 GLuint groundTex, skyTex, maskrosTex, dirtTex;
@@ -98,6 +98,7 @@ void init(void)
 	printError("GL inits");
 	cam_pos = SetVector(0.0, 0.0, 25.0);
 	cam_dir = SetVector(0.0, 0.0, 0.0);
+	//cam_up = SetVector(0.0,1.0,0.0);
 	v = SetVector(0.0, 0.0, 0.0);
 	// Load and compile shader
 
@@ -175,7 +176,7 @@ void display(void)
 
 	DrawModel(skybox, program_skynet, "in_Position", NULL, "inTexCoord");
 
-	printError("display");
+	printError("sad");
 
 	// Ground model
 	glUniform3f(glGetUniformLocation(program, "myPos"), cam_pos.x, cam_pos.y, cam_pos.z);
@@ -194,7 +195,7 @@ void display(void)
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
 
 	DrawModel(ground, program, "in_Position", "inNormal", "inTexCoord");
-	printError("display");
+	printError("asd");
 
 
   //Windmill rendering
@@ -207,7 +208,7 @@ void display(void)
 	glUniform1i(glGetUniformLocation(program, "texUnit"), 0);
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
 	DrawModel(blade1, program, "in_Position", "inNormal", "inTexCoord");
-
+	printError("Hej");
 	rot2 = Rx(3.14*0.5+t/500.0);
   total = Mult(Mult(trans,rot), rot2);
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
@@ -282,7 +283,8 @@ void mouseDragged(int x, int y)
 	m = ArbRotate(p, sqrt(p.x*p.x + p.y*p.y) / 50.0);
 	temp = SetVector(cam_dir.x - cam_pos.x, cam_dir.y - cam_pos.y,cam_dir.z - cam_pos.z);
 	cam_dir = VectorAdd(MultMat3Vec3(mat4tomat3(m),temp),cam_pos);
-	worldToViewMatrix = lookAt(cam_pos.x,cam_pos.y,cam_pos.z, cam_dir.x,cam_dir.y,cam_dir.z,0,1,0);//cam_dir.x, cam_dir.y, cam_dir.z, 0,1,0);
+	//cam_up = MultMat3Vec3(TransposeMat3(mat4tomat3(m)),cam_up);
+	worldToViewMatrix = lookAt(cam_pos.x,cam_pos.y,cam_pos.z, cam_dir.x,cam_dir.y,cam_dir.z,0,1,0);//cam_up.x,cam_up.y,cam_up.z);//cam_dir.x, cam_dir.y, cam_dir.z, 0,1,0);
 	glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 	prevx = x;
 	prevy = y;
@@ -291,15 +293,18 @@ void mouseDragged(int x, int y)
 
 void keyboard(unsigned char c, int x, int y)
 {
+		float a = 1.0;
 	switch (c)
 	{
 	case 27:
 		exit(0);
 		break;
 	case 'w':
-		v = SetVector(cam_dir.x - cam_pos.x, cam_dir.y - cam_pos.y, cam_dir.z - cam_pos.z);
-		cam_pos = SetVector(cam_pos.x + 0.01*v.x, cam_pos.y + 0.01*v.y, cam_pos.z + 0.01*v.z);
-		cam_dir = SetVector(cam_dir.x + 0.01*v.x, cam_dir.y + 0.01*v.y, cam_dir.z + 0.01*v.z);
+		v = SetVector(cam_pos.x-cam_dir.x,cam_pos.y - cam_dir.y, cam_pos.z - cam_dir.z);
+		vec3 front_vec = SetVector(0,0,-1);
+		vec3 front_rot = MultMat3Vec3(TransposeMat3(mat4tomat3(worldToViewMatrix)),front_vec);
+		cam_pos = SetVector(cam_pos.x +a*front_rot.x,cam_pos.y + a*front_rot.y,cam_pos.z + a*front_rot.z);//- b*v.x, cam_pos.y, cam_pos.z+b*v.z);
+		cam_dir = SetVector(cam_dir.x +a*front_rot.x,cam_dir.y + a*front_rot.y,cam_dir.z + a*front_rot.z);
 		worldToViewMatrix = lookAt(cam_pos.x,cam_pos.y,cam_pos.z, cam_dir.x,cam_dir.y,cam_dir.z,0,1,0);
 		glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 		glUniformMatrix4fv(glGetUniformLocation(program_skynet, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
@@ -307,17 +312,35 @@ void keyboard(unsigned char c, int x, int y)
 		break;
 	case 's':
 		v = SetVector(cam_pos.x-cam_dir.x,cam_pos.y - cam_dir.y, cam_pos.z - cam_dir.z);
-		cam_pos = SetVector(cam_pos.x + 0.01*v.x, cam_pos.y + 0.01*v.y, cam_pos.z + 0.01*v.z);
-		cam_dir = SetVector(cam_dir.x + 0.01*v.x, cam_dir.y + 0.01*v.y, cam_dir.z + 0.01*v.z);
+		vec3 back_vec = SetVector(0,0,1);
+		vec3 back_rot = MultMat3Vec3(TransposeMat3(mat4tomat3(worldToViewMatrix)),back_vec);
+		cam_pos = SetVector(cam_pos.x +a*back_rot.x,cam_pos.y + a*back_rot.y,cam_pos.z + a*back_rot.z);//- b*v.x, cam_pos.y, cam_pos.z+b*v.z);
+		cam_dir = SetVector(cam_dir.x +a*back_rot.x,cam_dir.y + a*back_rot.y,cam_dir.z + a*back_rot.z);
 		worldToViewMatrix = lookAt(cam_pos.x,cam_pos.y,cam_pos.z, cam_dir.x,cam_dir.y,cam_dir.z,0,1,0);
 		glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 		glUniformMatrix4fv(glGetUniformLocation(program_skynet, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 		glutPostRedisplay();
 		break;
 	case 'a':
+		v = SetVector(cam_pos.x-cam_dir.x,cam_pos.y - cam_dir.y, cam_pos.z - cam_dir.z);
+		vec3 left_vec = SetVector(-1,0,0);
+		vec3 left_rot = MultMat3Vec3(TransposeMat3(mat4tomat3(worldToViewMatrix)),left_vec);
+		cam_pos = SetVector(cam_pos.x +a*left_rot.x,cam_pos.y + a*left_rot.y,cam_pos.z + a*left_rot.z);//- b*v.x, cam_pos.y, cam_pos.z+b*v.z);
+		cam_dir = SetVector(cam_dir.x +a*left_rot.x,cam_dir.y + a*left_rot.y,cam_dir.z + a*left_rot.z);//-
+		worldToViewMatrix = lookAt(cam_pos.x,cam_pos.y,cam_pos.z, cam_dir.x,cam_dir.y,cam_dir.z,0,1,0);
+		glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
+		glUniformMatrix4fv(glGetUniformLocation(program_skynet, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 		glutPostRedisplay();
 		break;
 	case 'd':
+		v = SetVector(cam_pos.x-cam_dir.x,cam_pos.y - cam_dir.y, cam_pos.z - cam_dir.z);
+		vec3 right_vec = SetVector(1,0,0);
+		vec3 right_rot = MultMat3Vec3(TransposeMat3(mat4tomat3(worldToViewMatrix)),right_vec);
+		cam_pos = SetVector(cam_pos.x +a*right_rot.x,cam_pos.y + a*right_rot.y,cam_pos.z + a*right_rot.z);//- b*v.x, cam_pos.y, cam_pos.z+b*v.z);
+		cam_dir = SetVector(cam_dir.x +a*right_rot.x,cam_dir.y + a*right_rot.y,cam_dir.z + a*right_rot.z);
+		worldToViewMatrix = lookAt(cam_pos.x,cam_pos.y,cam_pos.z, cam_dir.x,cam_dir.y,cam_dir.z,0,1,0);
+		glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
+		glUniformMatrix4fv(glGetUniformLocation(program_skynet, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 		glutPostRedisplay();
 		break;
 	}

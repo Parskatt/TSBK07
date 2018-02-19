@@ -280,7 +280,7 @@ void mouse(int button, int state, int x, int y)
 }
 void mouseDragged(int x, int y)
 {
-	vec3 temp, p;
+	vec3 temp, p={0.0,0.0,0.0};
 	mat4 m;
 
 	p.y = prevx-x;
@@ -359,7 +359,7 @@ int main(int argc, char *argv[])
 	glutInit(&argc, argv);
 	glutInitContextVersion(3, 2);
 	glutCreateWindow("Lab3");
-	glutReshapeWindow(500,500);
+	glutReshapeWindow(2000,2000);
 	glutDisplayFunc(display);
 	glutTimerFunc(20, &OnTimer, 0);
 	glutMouseFunc(mouse);
