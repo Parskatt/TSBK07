@@ -109,7 +109,8 @@ void init(void)
 	glUniform1i(glGetUniformLocation(program_skynet, "skyTex"), 0);
 	printError("init shader");
 
-	program = loadShaders("lab3-4.vert","lab3-4.frag");
+	program = loadShaders("lab3-5.vert","lab3-5.frag");
+	glUseProgram(program);
 	worldToViewMatrix = lookAt(0, 0, 25, cam_dir.x, cam_dir.y, cam_dir.z, 0,1,0);
 
 	// Upload geometry to the GPU:
@@ -123,11 +124,17 @@ void init(void)
 	ground = LoadModelPlus("models/ground.obj");
 	bunny = LoadModelPlus("models/bunnyplus.obj");
 
-
 	// Load textures
+	glUniform1i(glGetUniformLocation(program, "tex0"), 0); // Texture unit 0
+	glUniform1i(glGetUniformLocation(program, "tex1"), 1); // Texture unit 1
 	LoadTGATextureSimple("grass.tga", &groundTex);
 	LoadTGATextureSimple("maskros512.tga", &maskrosTex);
 	LoadTGATextureSimple("dirt.tga", &dirtTex);
+
+	glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, groundTex);
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, groundTex);
 
   //Frustum matrix
   glUniformMatrix4fv(glGetUniformLocation(program, "projMatrix"), 1, GL_TRUE, projectionMatrix);
@@ -184,6 +191,8 @@ void display(void)
 	glEnable(GL_DEPTH_TEST);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, groundTex);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, groundTex);
 
 	glUseProgram(program);
 	glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
@@ -204,7 +213,6 @@ void display(void)
 	rot2 = Rx(0+t/500.0);
   total = Mult(trans,Mult(rot,rot2));
 	glUniform1f(glGetUniformLocation(program, "t"), t);
-	glUniform1i(glGetUniformLocation(program, "texUnit"), 0);
 	glUniformMatrix4fv(glGetUniformLocation(program, "mdlMatrix"), 1, GL_TRUE, total.m);
 	DrawModel(blade1, program, "in_Position", "inNormal", "inTexCoord");
 
@@ -246,10 +254,11 @@ void display(void)
 	glUniform1fv(glGetUniformLocation(program, "specularExponent"), 1, &specularExponent[1]);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, maskrosTex);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, dirtTex);
 	glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 
-
-	trans = T(-10,10,0);
+	trans = T(-10,1,0);
 	rot = Ry(0);
 	scale = S(10, 10, 10);
 	total = Mult(trans, rot);
@@ -291,15 +300,18 @@ void mouseDragged(int x, int y)
 
 void keyboard(unsigned char c, int x, int y)
 {
+	float a = 0.05;
+	float b = 0.5;
+
 	switch (c)
 	{
 	case 27:
 		exit(0);
 		break;
 	case 'w':
-		v = SetVector(cam_dir.x - cam_pos.x, cam_dir.y - cam_pos.y, cam_dir.z - cam_pos.z);
-		cam_pos = SetVector(cam_pos.x + 0.01*v.x, cam_pos.y + 0.01*v.y, cam_pos.z + 0.01*v.z);
-		cam_dir = SetVector(cam_dir.x + 0.01*v.x, cam_dir.y + 0.01*v.y, cam_dir.z + 0.01*v.z);
+		v = SetVector(cam_pos.x-cam_dir.x,cam_pos.y - cam_dir.y, cam_pos.z - cam_dir.z);
+		cam_pos = SetVector(cam_pos.x - a*v.x, cam_pos.y, cam_pos.z - a*v.z);
+		cam_dir = SetVector(cam_dir.x - a*v.x, cam_dir.y, cam_dir.z - a*v.z);
 		worldToViewMatrix = lookAt(cam_pos.x,cam_pos.y,cam_pos.z, cam_dir.x,cam_dir.y,cam_dir.z,0,1,0);
 		glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 		glUniformMatrix4fv(glGetUniformLocation(program_skynet, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
@@ -307,17 +319,30 @@ void keyboard(unsigned char c, int x, int y)
 		break;
 	case 's':
 		v = SetVector(cam_pos.x-cam_dir.x,cam_pos.y - cam_dir.y, cam_pos.z - cam_dir.z);
-		cam_pos = SetVector(cam_pos.x + 0.01*v.x, cam_pos.y + 0.01*v.y, cam_pos.z + 0.01*v.z);
-		cam_dir = SetVector(cam_dir.x + 0.01*v.x, cam_dir.y + 0.01*v.y, cam_dir.z + 0.01*v.z);
+		cam_pos = SetVector(cam_pos.x + a*v.x, cam_pos.y, cam_pos.z + a*v.z);
+		cam_dir = SetVector(cam_dir.x + a*v.x, cam_dir.y, cam_dir.z + a*v.z);
 		worldToViewMatrix = lookAt(cam_pos.x,cam_pos.y,cam_pos.z, cam_dir.x,cam_dir.y,cam_dir.z,0,1,0);
 		glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 		glUniformMatrix4fv(glGetUniformLocation(program_skynet, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 		glutPostRedisplay();
 		break;
 	case 'a':
+		v = SetVector(cam_pos.x-cam_dir.x,cam_pos.y - cam_dir.y, cam_pos.z - cam_dir.z);
+		cam_pos = SetVector(cam_pos.x - b*v.x, cam_pos.y, cam_pos.z);
+		cam_dir = SetVector(cam_dir.x - b*v.x, cam_dir.y, cam_dir.z);
+		worldToViewMatrix = lookAt(cam_pos.x,cam_pos.y,cam_pos.z, cam_dir.x,cam_dir.y,cam_dir.z,0,1,0);
+		glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
+		glUniformMatrix4fv(glGetUniformLocation(program_skynet, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
 		glutPostRedisplay();
 		break;
 	case 'd':
+		v = SetVector(cam_pos.x-cam_dir.x, cam_pos.y - cam_dir.y, cam_pos.z - cam_dir.z);
+		cam_pos = SetVector(cam_pos.x + b*v.x, cam_pos.y, cam_pos.z);
+		cam_dir = SetVector(cam_dir.x + b*v.x, cam_dir.y, cam_dir.z);
+		worldToViewMatrix = lookAt(cam_pos.x,cam_pos.y,cam_pos.z, cam_dir.x,cam_dir.y,cam_dir.z,0,1,0);
+		glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
+		glUniformMatrix4fv(glGetUniformLocation(program_skynet, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
+		glutPostRedisplay();
 		glutPostRedisplay();
 		break;
 	}
@@ -326,7 +351,8 @@ int main(int argc, char *argv[])
 {
 	glutInit(&argc, argv);
 	glutInitContextVersion(3, 2);
-	glutCreateWindow("GL3 triangle example");
+	glutCreateWindow("Lab3");
+	glutReshapeWindow(500,500);
 	glutDisplayFunc(display);
 	glutTimerFunc(20, &OnTimer, 0);
 	glutMouseFunc(mouse);

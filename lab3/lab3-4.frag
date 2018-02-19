@@ -24,7 +24,7 @@ void main(void)
 	diffuse_component = clamp(diffuse_component, 0, 1);
 	vec3 temp = vec3(0,0,0);
 
-	for (int i = 0; i < 1;  i++)
+	for (int i = 0; i < 3;  i++)
 	{
 		vec3 reflectedLightDirection = reflect(-mat3(camMatrix)*lightSourcesDirPosArr[i], normalize(outNormal));
 		vec3 eyeDirection = normalize(-surf);
@@ -37,7 +37,8 @@ void main(void)
 		}
 		diffuse_component = dot(normalize(outNormal), mat3(camMatrix)*lightSourcesDirPosArr[i]);
 		diffuse_component = clamp(diffuse_component, 0, 1);
-		temp = temp + (diffuse_component*0.0+0.5*specularStrength)*lightSourcesColorArr[i];
+		temp = temp + (diffuse_component*0.5+0.5*specularStrength)*lightSourcesColorArr[i];
 	}
+
 	out_Color = a*vec4(normalize(temp),1.0);
 }
