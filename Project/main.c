@@ -11,7 +11,7 @@
 
 //Globals
 mat4 projectionMatrix, worldToViewMatrix, modelToWorldMatrix, totMatrix;
-vec3 cam_pos,cam_dir;
+vec3 cam_pos,cam_dir,cam_speed;
 GLint prevx,prevy;
 //Initialize Shading stuff
 GLuint basic_shading, skybox_shading, advanced_shading;
@@ -27,14 +27,15 @@ void init(void)
 	glDisable(GL_CULL_FACE);
 	printError("GL inits");
 
-	projectionMatrix = frustum(-0.1, 0.1, -0.1, 0.1, 0.2, 1000.0);
+	projectionMatrix = frustum(-0.18, 0.18, -0.1, 0.1, 0.2, 1000.0);
 	//Load Shaders
 	load_shaders(&basic_shading);	// Load and compile shader
 	glUseProgram(basic_shading);
 	printError("init shader");
-	cam_dir = SetVector(0, 0, 20);
+	//Camera init
+	cam_pos = SetVector(0, 0, 0);
+	cam_dir = SetVector(0, 0, 10);
 	worldToViewMatrix = lookAt(cam_pos.x, cam_pos.y, cam_pos.z, cam_dir.x, cam_dir.y, cam_dir.z, 0,1,0);
-	modelToWorldMatrix = T(0,0,10);
 	// Load models
 	octa = LoadModelPlus("Models/octagon.obj");
   printError("init");
@@ -52,9 +53,10 @@ void display(void)
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glUseProgram(basic_shading); //program used when drawing octagon
+	modelToWorldMatrix = T(0,0,10);
 	totMatrix = Mult(projectionMatrix,Mult(worldToViewMatrix,modelToWorldMatrix));
 	glUniformMatrix4fv(glGetUniformLocation(basic_shading, "totMatrix"), 1, GL_TRUE, totMatrix.m);
-	DrawModel(octa, basic_shading, "inPosition", NULL, "inTexCoord");
+	DrawModel(octa, basic_shading, "inPosition", "inNormal", "inTexCoord");
 	printError("display");
 	glutSwapBuffers();
 }
@@ -82,7 +84,7 @@ int main(int argc, char **argv)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
 	glutInitContextVersion(3, 2);
-	glutInitWindowSize (600, 600);
+	glutInitWindowSize (1920, 1080);
 	glutCreateWindow ("Project");
 	glutDisplayFunc(display);
 	init();

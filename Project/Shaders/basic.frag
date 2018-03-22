@@ -12,5 +12,5 @@ uniform sampler2D tex;
 
 void main()
 {
-	outColor = vec4(1.0, 1.0, 1.0, 1.0);
+	outColor = vec4(normalize(shade), 1.0);
 }

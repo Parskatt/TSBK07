@@ -14,7 +14,8 @@ uniform mat4 totMatrix;
 
 void main()
 {
-	shade = mat3(totMatrix)*inNormal;
+ 	vec3 light = vec3(0.58,0.58,0.58);
+	shade = inNormal;//vec3(max(0,dot(light,normalize(inNormal))));
 	texCoord = inTexCoord;
 	gl_Position = totMatrix * vec4(inPosition, 1.0);
 }

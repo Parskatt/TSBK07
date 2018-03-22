@@ -2,11 +2,11 @@
 
 void camera_init()
 {
-	
+
 }
 void keyboard(unsigned char c, int x, int y, mat4* worldToViewMatrix, vec3* cam_pos, vec3* cam_dir)
 {
-	float a = 1;
+	static float a = 0.1;
 	vec3 direction = SetVector(0,0,0);
 	switch (c)
 	{
@@ -25,8 +25,13 @@ void keyboard(unsigned char c, int x, int y, mat4* worldToViewMatrix, vec3* cam_
 	case 'd':
 		direction = SetVector(1,0,0);
 		break;
+	default:
+		direction = SetVector(0,0,0);
+		a = 0.0;
+		break;
 	}
 	vec3 rot = MultMat3Vec3(TransposeMat3(mat4tomat3(*worldToViewMatrix)),direction);
+	//*cam_speed = SetVector(cam_speed->x +a*rot.x,cam_speed->y + a*rot.y,cam_speed->z + a*rot.z);
 	*cam_pos = SetVector(cam_pos->x +a*rot.x,cam_pos->y + a*rot.y,cam_pos->z + a*rot.z);//- b*v.x, cam_pos.y, cam_pos.z+b*v.z);
 	*cam_dir = SetVector(cam_dir->x +a*rot.x,cam_dir->y + a*rot.y,cam_dir->z + a*rot.z);
 	*worldToViewMatrix = lookAt(cam_pos->x,cam_pos->y,cam_pos->z, cam_dir->x,cam_dir->y,cam_dir->z,0,1,0);
