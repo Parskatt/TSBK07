@@ -16,8 +16,14 @@ GLint prevx,prevy;
 //Initialize Shading stuff
 GLuint basic_shading, skybox_shading, advanced_shading;
 //Initialize Model stuff
-Model *octa;
-//GLuint maskros_tex;
+Model *octa[3]; // 3 octagons
+
+char *textureFileName[3] =
+{
+	"Textures/dirt.tga",
+	"Textures/Earth.tga",
+	"Textures/maskros512.tga",
+};
 
 void init(void)
 {
@@ -36,7 +42,12 @@ void init(void)
 	worldToViewMatrix = lookAt(cam_pos.x, cam_pos.y, cam_pos.z, cam_dir.x, cam_dir.y, cam_dir.z, 0,1,0);
 	modelToWorldMatrix = T(0,0,10);
 	// Load models
-	octa = LoadModelPlus("Models/octagon.obj");
+
+	//TODO make a load_model function for this
+	octa[0] = LoadModelPlus("Models/octagon.obj");
+	octa[1] = LoadModelPlus("Models/octagon.obj");
+	octa[2] = LoadModelPlus("Models/octagon.obj");
+
   printError("init");
 	glutPostRedisplay();
 }
@@ -54,7 +65,16 @@ void display(void)
 	glUseProgram(basic_shading); //program used when drawing octagon
 	totMatrix = Mult(projectionMatrix,Mult(worldToViewMatrix,modelToWorldMatrix));
 	glUniformMatrix4fv(glGetUniformLocation(basic_shading, "totMatrix"), 1, GL_TRUE, totMatrix.m);
-	DrawModel(octa, basic_shading, "inPosition", NULL, "inTexCoord");
+
+	//TODO make a function that does this loop
+	for (int i = 0; i < 3; i++)
+	{
+			mat4 temp = T(2*i, 0, 10); //Changes the positions of the polygons
+			totMatrix = Mult(totMatrix, temp);
+			glUniformMatrix4fv(glGetUniformLocation(basic_shading, "totMatrix"), 1, GL_TRUE, totMatrix.m);
+			DrawModel(octa[i], basic_shading, "inPosition", NULL, "inTexCoord");
+	}
+
 	printError("display");
 	glutSwapBuffers();
 }
