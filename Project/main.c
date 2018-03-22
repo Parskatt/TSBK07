@@ -17,7 +17,6 @@ GLint prevx,prevy;
 GLuint basic_shading, skybox_shading, advanced_shading;
 //Initialize Model stuff
 Model *octa;
-GLuint program;
 //GLuint maskros_tex;
 
 void init(void)
@@ -30,8 +29,8 @@ void init(void)
 
 	projectionMatrix = frustum(-0.1, 0.1, -0.1, 0.1, 0.2, 1000.0);
 	//Load Shaders
-	load_shaders(&basic_shading,&skybox_shading,&advanced_shading)	// Load and compile shader
-	glUseProgram(program);
+	load_shaders(&basic_shading);	// Load and compile shader
+	glUseProgram(basic_shading);
 	printError("init shader");
 	cam_dir = SetVector(0, 0, 20);
 	worldToViewMatrix = lookAt(cam_pos.x, cam_pos.y, cam_pos.z, cam_dir.x, cam_dir.y, cam_dir.z, 0,1,0);
@@ -52,15 +51,10 @@ void display(void)
 {
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glUseProgram(program); //program used when drawing octagon
+	glUseProgram(basic_shading); //program used when drawing octagon
 	totMatrix = Mult(projectionMatrix,Mult(worldToViewMatrix,modelToWorldMatrix));
-	//modelworld = IdentityMatrix();
-	//glActiveTexture(GL_TEXTURE0);
-	//glBindTexture(GL_TEXTURE_2D, maskros_tex);
-	glUniformMatrix4fv(glGetUniformLocation(program, "totMatrix"), 1, GL_TRUE, totMatrix.m);
-	DrawModel(octa, program, "inPosition", "inNormal", "inTexCoord");
-	printf("cam_pos: %1f %1f %1f \n", cam_pos.x, cam_pos.y, cam_pos.z);
-	printf("cam_dir: %1f %1f %1f \n", cam_dir.x, cam_dir.y, cam_dir.z);
+	glUniformMatrix4fv(glGetUniformLocation(basic_shading, "totMatrix"), 1, GL_TRUE, totMatrix.m);
+	DrawModel(octa, basic_shading, "inPosition", NULL, "inTexCoord");
 	printError("display");
 	glutSwapBuffers();
 }

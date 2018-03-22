@@ -1,9 +1,8 @@
-#version 400
+#version 150
 
 //In
-in vec2 texCoord;
+in vec2 TexCoord;
 in vec3 shade;
-in vec3 Position;
 
 //Out
 out vec4 outColor;
