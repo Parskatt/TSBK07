@@ -218,7 +218,6 @@ void timer(int i)
 	glutPostRedisplay();
 }
 
-
 void mouse(int button, int state, int x, int y) // not removed int button
 {
 	if (state == GLUT_DOWN)
