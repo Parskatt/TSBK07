@@ -41,7 +41,7 @@ void display(void)
 	mat4 total = IdentityMatrix();
 
 	//octagon model
-	glUniformMatrix4fv(glGetUniformLocation(program, "totmatrix"), 1, GL_TRUE, total.m);
+	glUniformMatrix4fv(glGetUniformLocation(program, "totMatrix"), 1, GL_TRUE, total.m);
 	DrawModel(octa, program, "inPosition", "inNormal", "inTexCoord");
 	glutSwapBuffers();
 }

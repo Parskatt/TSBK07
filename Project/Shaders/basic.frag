@@ -6,7 +6,7 @@ in vec3 shade;
 in vec3 Position;
 uniform sampler2D tex;
 
-void main(void)
+void main()
 {
 	outColor = vec4(shade,1.0);
 }
