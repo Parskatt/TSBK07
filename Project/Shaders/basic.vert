@@ -8,7 +8,7 @@ out vec3 shade;
 
 uniform mat4 totMatrix;
 
-void main(void)
+void main()
 {
 	const vec3 light = vec3(0.58, 0.58, 0.58);
 	shade = vec3(max(0,dot(normalize(inNormal), light)));
