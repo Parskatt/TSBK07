@@ -115,7 +115,6 @@ void init(void)
 	program = loadShaders("terrain5.vert", "terrain5.frag");
 	glUseProgram(program);
 	printError("init shader");
-
 	cam_pos = SetVector(0, 0, 30);
 	cam_dir = SetVector(0, 0, 20);
 	worldToViewMatrix = lookAt(cam_pos.x, cam_pos.y, cam_pos.z, cam_dir.x, cam_dir.y, cam_dir.z, 0,1,0);

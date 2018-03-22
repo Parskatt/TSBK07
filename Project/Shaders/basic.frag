@@ -1,7 +1,7 @@
 #version 150
 
 //In
-in vec2 TexCoord;
+in vec2 texCoord;
 in vec3 shade;
 
 //Out
@@ -12,5 +12,5 @@ uniform sampler2D tex;
 
 void main()
 {
-	outColor = vec4(1.0, 1.0, 1.0, 1.0);
+	outColor = texture(tex, texCoord);
 }
