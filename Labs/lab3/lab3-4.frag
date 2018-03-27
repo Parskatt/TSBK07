@@ -18,7 +18,6 @@ uniform float t;
 
 void main(void)
 {
-
 	vec4 a = texture(texUnit, texCoord);
 	float diffuse_component=0;
 	vec3 temp = vec3(0.0,0.0,0.0);

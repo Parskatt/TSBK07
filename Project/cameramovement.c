@@ -1,12 +1,16 @@
 #include "cameramovement.h"
 
-void camera_init()
+void camera_init(vec3 *cam_pos,vec3 *cam_dir,mat4 *projectionMatrix,mat4 *worldToViewMatrix)
 {
-
+	*cam_pos = SetVector(0, 0, 0);
+	*cam_dir = SetVector(0, 0, 10);
+	*worldToViewMatrix = lookAt(cam_pos->x, cam_pos->y, cam_pos->z, cam_dir->x, cam_dir->y, cam_dir->z, 0,1,0);
+	*projectionMatrix = frustum(-0.16, 0.16, -0.09, 0.09, 0.2, 1000.0);
 }
+
 void keyboard(unsigned char c, int x, int y, mat4* worldToViewMatrix, vec3* cam_pos, vec3* cam_dir)
 {
-	static float a = 0.1;
+	static float a = 0.05;
 	vec3 direction = SetVector(0,0,0);
 	switch (c)
 	{
@@ -24,6 +28,9 @@ void keyboard(unsigned char c, int x, int y, mat4* worldToViewMatrix, vec3* cam_
 		break;
 	case 'd':
 		direction = SetVector(1,0,0);
+		break;
+	case 'f': //For fullscreen
+		glutToggleFullScreen();
 		break;
 	default:
 		direction = SetVector(0,0,0);
@@ -57,13 +64,11 @@ void mouseDragged(int x, int y, int* prevx, int* prevy, mat4* worldToViewMatrix,
 	p.z = 0;
 	mat3 wv3 = TransposeMat3(mat4tomat3(*worldToViewMatrix));//View->World
 	p = MultMat3Vec3(wv3, p); //send p to world coordinates
-	m = ArbRotate(p, sqrt(p.x*p.x + p.y*p.y) / 50.0);
+	m = ArbRotate(p, sqrt(p.x*p.x + p.y*p.y) / 200.0);
 	temp = SetVector(cam_dir->x - cam_pos->x, cam_dir->y - cam_pos->y,cam_dir->z - cam_pos->z);
 	*cam_dir = VectorAdd(MultMat3Vec3(mat4tomat3(m),temp),*cam_pos);
 	*worldToViewMatrix = lookAt(cam_pos->x,cam_pos->y,cam_pos->z, cam_dir->x,cam_dir->y,cam_dir->z,0,1,0);
 	*prevx = x;
 	*prevy = y;
-	//glUniformMatrix4fv(glGetUniformLocation(program, "camMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
-	//glutPostRedisplay();
 	glutPostRedisplay();
 }

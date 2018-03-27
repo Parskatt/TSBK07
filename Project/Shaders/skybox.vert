@@ -1,7 +1,8 @@
 #version 400
 
 //In
-in vec3 in_Position;
+in vec3 inPosition;
+in vec3 inNormal;
 in vec2 inTexCoord;
 
 //Out
@@ -15,5 +16,5 @@ uniform sampler2D texUnit;
 void main(void)
 {
 	texCoord = inTexCoord;
-	gl_Position = totMatrix*vec4(in_Position, 1.0);
+	gl_Position = totMatrix*vec4(inPosition, 1.0);
 }

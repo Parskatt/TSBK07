@@ -8,6 +8,7 @@
 #include "LoadTGA.h"
 #include "cameramovement.h"
 #include "load_shaders.h"
+#include "objects.h"
 
 //Globals
 mat4 projectionMatrix, worldToViewMatrix, modelToWorldMatrix, totMatrix;
@@ -16,7 +17,9 @@ GLint prevx,prevy;
 //Initialize Shading stuff
 GLuint basic_shading, skybox_shading, advanced_shading;
 //Initialize Model stuff
-Model *octa;
+Model *octa, *skybox;
+//Init textures TODO dont do it like this pls
+GLuint skyTex;
 //GLuint maskros_tex;
 
 void init(void)
@@ -27,62 +30,70 @@ void init(void)
 	glDisable(GL_CULL_FACE);
 	printError("GL inits");
 
-	projectionMatrix = frustum(-0.18, 0.18, -0.1, 0.1, 0.2, 1000.0);
 	//Load Shaders
-	load_shaders(&basic_shading);	// Load and compile shader
-	glUseProgram(basic_shading);
-	printError("init shader");
+	load_shaders(&basic_shading,&skybox_shading);	// Load and compile shader
 	//Camera init
-	cam_pos = SetVector(0, 0, 0);
-	cam_dir = SetVector(0, 0, 10);
-	worldToViewMatrix = lookAt(cam_pos.x, cam_pos.y, cam_pos.z, cam_dir.x, cam_dir.y, cam_dir.z, 0,1,0);
+	camera_init(&cam_pos,&cam_dir,&projectionMatrix,&worldToViewMatrix);
 	// Load models
 	octa = LoadModelPlus("Models/octagon.obj");
-  printError("init");
+	skybox = LoadModelPlus("Models/skybox.obj");
+	//Textures?
+	LoadTGATextureSimple("Textures/SkyBox512.tga", &skyTex);
+
 	glutPostRedisplay();
 }
 
 void timer(int i)
 {
-	glutPostRedisplay();
-	glutTimerFunc(20, &timer, i);
+	glutTimerFunc(10, &timer, i);
 }
 
 void display(void)
 {
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//Draw the skybox
+	glDisable(GL_DEPTH_TEST);
+	glUseProgram(skybox_shading);
+	//TODO dont bind every time, only bind when it is necessary
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, skyTex);
+	glUniform1i(glGetUniformLocation(skybox_shading, "texUnit"), GL_TEXTURE1);
+	modelToWorldMatrix = T(cam_pos.x,cam_pos.y,cam_pos.z);
+	totMatrix = Mult(projectionMatrix,Mult(worldToViewMatrix,modelToWorldMatrix));
+	glUniformMatrix4fv(glGetUniformLocation(skybox_shading, "totMatrix"), 1, GL_TRUE, totMatrix.m);
+	DrawModel(skybox, skybox_shading, "inPosition", "inNormal", "inTexCoord");
+	glEnable(GL_DEPTH_TEST);
+	//Draw other objects
 	glUseProgram(basic_shading); //program used when drawing octagon
 	modelToWorldMatrix = T(0,0,10);
 	totMatrix = Mult(projectionMatrix,Mult(worldToViewMatrix,modelToWorldMatrix));
 	glUniformMatrix4fv(glGetUniformLocation(basic_shading, "totMatrix"), 1, GL_TRUE, totMatrix.m);
 	DrawModel(octa, basic_shading, "inPosition", "inNormal", "inTexCoord");
-	printError("display");
+
 	glutSwapBuffers();
 }
 
 void mousefunc(int button, int state, int x, int y)
 {
   mouse(button, state, x, y, &prevx, &prevy);
-	glutPostRedisplay();
 }
 
 void mouseDraggedfunc(int x, int y)
 {
   mouseDragged(x, y, &prevx, &prevy, &worldToViewMatrix, &cam_dir, &cam_pos);
-	glutPostRedisplay();
 }
 
 void keyboardfunc(unsigned char c, int x, int y)
 {
   keyboard(c, x, y, &worldToViewMatrix, &cam_pos, &cam_dir);
-	glutPostRedisplay();
 }
 
 int main(int argc, char **argv)
 {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_DEPTH);
+	glutInitDisplayMode(GLUT_DEPTH|GLUT_DOUBLE);
 	glutInitContextVersion(3, 2);
 	glutInitWindowSize (1920, 1080);
 	glutCreateWindow ("Project");
@@ -94,7 +105,7 @@ int main(int argc, char **argv)
 	glutMotionFunc(&mouseDraggedfunc);
 	glutKeyboardFunc(&keyboardfunc);
 
-	glutTimerFunc(20, &timer, 0);
+	glutTimerFunc(10, &timer, 0);
 
 	glutMainLoop();
 	exit(0);

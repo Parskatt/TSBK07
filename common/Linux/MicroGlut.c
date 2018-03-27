@@ -135,7 +135,7 @@ make_window( Display *dpy, const char *name,
 		glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
 
 		// Verify that GLX implementation supports the new context create call
-		if ( strstr( glXQueryExtensionsString( dpy, scrnum ), 
+		if ( strstr( glXQueryExtensionsString( dpy, scrnum ),
 			"GLX_ARB_create_context" ) != 0 )
 		glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc)
 			glXGetProcAddress( (const GLubyte *) "glXCreateContextAttribsARB" );
@@ -318,7 +318,7 @@ void glutCreateWindow(const char *windowTitle)
    }
 
    make_window(dpy, windowTitle, winPosX, winPosY, winWidth, winHeight, &win, &ctx);
-   
+
    XMapWindow(dpy, win);
    glXMakeCurrent(dpy, win, ctx);
 }
@@ -382,10 +382,10 @@ void doKeyboardEvent(XEvent event, void (*keyProc)(unsigned char key, int x, int
 {
 	char buffer[10];
 //	int r; // code;
-	
+
 	int code = ((XKeyEvent *)&event)->keycode;
-	
-//	r = 
+
+//	r =
 	XLookupString(&event.xkey, buffer, sizeof(buffer), NULL, NULL);
 	char raw = buffer[0]; // Before remapping
 	switch(code)
@@ -426,8 +426,8 @@ void doKeyboardEvent(XEvent event, void (*keyProc)(unsigned char key, int x, int
 		case 81: buffer[0] = GLUT_KEY_PAGE_UP; break;
 		case 82: buffer[0] = 127; break;
 //		case 77: buffer[0] = GLUT_KEY_KEYPAD_NUMLOCK; break;
-	}	
-	
+	}
+
 	// If we asked for a separate callback for special ketys, call it. Otherwise call the standard one.
 	// I am considering removing the special callback for simplicity!
 	if (raw == 0)
@@ -442,7 +442,7 @@ void doKeyboardEvent(XEvent event, void (*keyProc)(unsigned char key, int x, int
 		if (keyProc)
 			keyProc(buffer[0], 0, 0);
 	gKeymap[(int)buffer[0]] = keyMapValue;
-	
+
 //	printf("%c %d %d %d\n", buffer[0], buffer[0], r, code);
 
 //	      			if (event.type == KeyPress)
@@ -472,8 +472,8 @@ void glutMainLoop()
          		if (event.xclient.data.l[0] == wmDeleteMessage) // quit!
          			gRunning = 0;
 	         	break;
-         	case Expose: 
-//			op = 1; 
+         	case Expose:
+//			op = 1;
 				break; // Update event! Should do draw here.
          	case ConfigureNotify:
 				if (gReshape)
@@ -535,7 +535,7 @@ void glutMainLoop()
 			break;
          }
       }
-      
+
       if (animate)
       {
       	animate = 0;
@@ -569,7 +569,7 @@ void glutPostRedisplay()
 int glutGet(int type)
 {
 	struct timeval tv;
-	
+
 	gettimeofday(&tv, NULL);
 	return (tv.tv_usec - timeStart.tv_usec) / 1000 + (tv.tv_sec - timeStart.tv_sec)*1000;
 }
@@ -713,17 +713,17 @@ void glutShowCursor()
 
 void glutHideCursor()
 {
-	if (dpy == NULL) 
+	if (dpy == NULL)
 	{
 	   printf("glutHideCursor failed: MicroGlut not initialized!\n");
    	return;
 	}
-	
+
 	Cursor invisibleCursor;
 	Pixmap bitmapNoData;
 	static char noll[] = { 0,0,0};
 	bitmapNoData = XCreateBitmapFromData(dpy, win, noll, 1, 1);
-	invisibleCursor = XCreatePixmapCursor(dpy,bitmapNoData, bitmapNoData, 
+	invisibleCursor = XCreatePixmapCursor(dpy,bitmapNoData, bitmapNoData,
 	                                     (XColor *)noll, (XColor *)noll, 0, 0);
 	XDefineCursor(dpy,win, invisibleCursor);
 	XFreeCursor(dpy, invisibleCursor);
@@ -737,7 +737,7 @@ char glutKeyIsDown(unsigned char c)
 	return gKeymap[(unsigned int)c];
 }
 
-// Added by the Risinger/RŒberg/Wikstršm project! But... gButtonPressed
+// Added by the Risinger/Rï¿½berg/Wikstrï¿½m project! But... gButtonPressed
 // was already here! Did I miss something?
 char glutMouseIsDown(unsigned char c)
 {
@@ -802,4 +802,3 @@ void glutExit()
 {
 	gRunning = 0;
 }
-
