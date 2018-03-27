@@ -10,12 +10,15 @@
 #include "loadobj.h"
 #include "LoadTGA.h"
 
-struct Object{
+typedef struct WorldObject WorldObject;
+
+struct WorldObject{
   mat4 position;
   Model* model_ptr;
   GLuint texture_id;
-}
+};
 
-Object* Object_new(int tex_id, char* model, mat4* value);
+WorldObject* new_object(char* texture, GLuint tex_id, char* model, mat4 value);
+void render_object(WorldObject* object);
 
 #endif //OBJECTS_H

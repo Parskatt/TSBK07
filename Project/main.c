@@ -10,7 +10,7 @@
 #include "load_shaders.h"
 #include "objects.h"
 
-//Globals
+//"Globals"
 mat4 projectionMatrix, worldToViewMatrix, modelToWorldMatrix, totMatrix;
 vec3 cam_pos,cam_dir,cam_speed;
 GLint prevx,prevy;
@@ -20,8 +20,8 @@ GLuint basic_shading, skybox_shading, advanced_shading;
 Model *octa, *skybox;
 //Init textures TODO dont do it like this pls
 GLuint skyTex;
-//GLuint maskros_tex;
-
+//Make objects instead
+WorldObject* object;
 void init(void)
 {
 	// GL inits
@@ -39,7 +39,8 @@ void init(void)
 	skybox = LoadModelPlus("Models/skybox.obj");
 	//Textures?
 	LoadTGATextureSimple("Textures/SkyBox512.tga", &skyTex);
-
+	//Make world object cause this is much cooler. Constructor which Loads the associated TGA-file, object file and position.
+	object = new_object("Textures/maskros512.tga", "Models/octagon.obj", T(0,0,10));
 	glutPostRedisplay();
 }
 
@@ -66,12 +67,18 @@ void display(void)
 	DrawModel(skybox, skybox_shading, "inPosition", "inNormal", "inTexCoord");
 	glEnable(GL_DEPTH_TEST);
 	//Draw other objects
-	glUseProgram(basic_shading); //program used when drawing octagon
+	/*glUseProgram(basic_shading); //program used when drawing octagon
 	modelToWorldMatrix = T(0,0,10);
 	totMatrix = Mult(projectionMatrix,Mult(worldToViewMatrix,modelToWorldMatrix));
 	glUniformMatrix4fv(glGetUniformLocation(basic_shading, "totMatrix"), 1, GL_TRUE, totMatrix.m);
-	DrawModel(octa, basic_shading, "inPosition", "inNormal", "inTexCoord");
-
+	DrawModel(octa, basic_shading, "inPosition", "inNormal", "inTexCoord");*/
+	//Draw using object container
+	/*glUseProgram(basic_shading); //program used when drawing octagon
+	modelToWorldMatrix = object.position;
+	totMatrix = Mult(projectionMatrix,Mult(worldToViewMatrix,modelToWorldMatrix));
+	glUniformMatrix4fv(glGetUniformLocation(basic_shading, "totMatrix"), 1, GL_TRUE, totMatrix.m);
+	DrawModel(object.model_ptr, basic_shading, "inPosition", "inNormal", "inTexCoord");
+*/
 	glutSwapBuffers();
 }
 
