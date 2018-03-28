@@ -55,17 +55,6 @@ void display(void)
 	//Draw the skybox
 
 	glDisable(GL_DEPTH_TEST);
-	/*
-	glUseProgram(skybox_shading);
-	//TODO dont bind every time, only bind when it is necessary
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, skyTex);
-	glUniform1i(glGetUniformLocation(skybox_shading, "texUnit"), GL_TEXTURE1);
-	modelToWorldMatrix = T(cam_pos.x,cam_pos.y,cam_pos.z);
-	totMatrix = Mult(projectionMatrix,Mult(worldToViewMatrix,modelToWorldMatrix));
-	glUniformMatrix4fv(glGetUniformLocation(skybox_shading, "totMatrix"), 1, GL_TRUE, totMatrix.m);
-	DrawModel(skybox, skybox_shading, "inPosition", "inNormal", "inTexCoord");
-	*/
 	render_object(skybox, worldToViewMatrix, &projectionMatrix, &skybox_shading, 0);
 
 	glEnable(GL_DEPTH_TEST);
