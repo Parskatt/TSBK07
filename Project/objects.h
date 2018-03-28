@@ -10,6 +10,11 @@
 #include "loadobj.h"
 #include "LoadTGA.h"
 
+//Define stuff for more advanced renderer
+#define SKYBOX_SHADING 0
+#define BASIC_SHADING 1
+#define ADVANCED_SHADING 2
+
 typedef struct WorldObject WorldObject;
 
 struct WorldObject{

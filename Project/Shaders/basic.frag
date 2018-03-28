@@ -2,15 +2,15 @@
 
 //In
 in vec2 TexCoord;
-in vec3 shade;
+in float shade;
 
 //Out
 out vec4 outColor;
 
 //Uniforms
-uniform sampler2D tex;
+uniform sampler2D texUnit;
 
 void main()
 {
-	outColor = vec4(normalize(shade), 1.0);
+	outColor = shade*texture(texUnit, TexCoord);
 }

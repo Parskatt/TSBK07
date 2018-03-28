@@ -31,7 +31,7 @@ void init(void)
 	printError("GL inits");
 
 	//Load Shaders
-	load_shaders(&basic_shading,&skybox_shading);	// Load and compile shader
+	load_shaders(&basic_shading,&skybox_shading, &advanced_shading);	// Load and compile shader
 	//Camera init
 	camera_init(&cam_pos,&cam_dir,&projectionMatrix,&worldToViewMatrix);
 	// Load models
@@ -66,14 +66,15 @@ void display(void)
 	glUniformMatrix4fv(glGetUniformLocation(skybox_shading, "totMatrix"), 1, GL_TRUE, totMatrix.m);
 	DrawModel(skybox, skybox_shading, "inPosition", "inNormal", "inTexCoord");
 	glEnable(GL_DEPTH_TEST);
-	render_object(object, &worldToViewMatrix, &projectionMatrix, &basic_shading);
+	//Draw using object container
+	render_object(object, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	//Draw other objects
 	/*glUseProgram(basic_shading); //program used when drawing octagon
 	modelToWorldMatrix = T(0,0,10);
 	totMatrix = Mult(projectionMatrix,Mult(worldToViewMatrix,modelToWorldMatrix));
 	glUniformMatrix4fv(glGetUniformLocation(basic_shading, "totMatrix"), 1, GL_TRUE, totMatrix.m);
 	DrawModel(octa, basic_shading, "inPosition", "inNormal", "inTexCoord");*/
-	//Draw using object container
+
 	/*glUseProgram(basic_shading); //program used when drawing octagon
 	modelToWorldMatrix = object.position;
 	totMatrix = Mult(projectionMatrix,Mult(worldToViewMatrix,modelToWorldMatrix));
