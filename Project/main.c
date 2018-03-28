@@ -66,6 +66,7 @@ void display(void)
 	glUniformMatrix4fv(glGetUniformLocation(skybox_shading, "totMatrix"), 1, GL_TRUE, totMatrix.m);
 	DrawModel(skybox, skybox_shading, "inPosition", "inNormal", "inTexCoord");
 	glEnable(GL_DEPTH_TEST);
+	render_object(object, &worldToViewMatrix, &projectionMatrix, &basic_shading);
 	//Draw other objects
 	/*glUseProgram(basic_shading); //program used when drawing octagon
 	modelToWorldMatrix = T(0,0,10);

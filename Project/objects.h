@@ -18,7 +18,7 @@ struct WorldObject{
   GLuint texture_id;
 };
 
-WorldObject* new_object(char* texture, GLuint tex_id, char* model, mat4 value);
-void render_object(WorldObject* object);
+WorldObject* new_object(char* texture, char* model, mat4 value);
+void render_object(WorldObject* object, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader);
 
 #endif //OBJECTS_H
