@@ -9,7 +9,7 @@
 #include "cameramovement.h"
 #include "load_shaders.h"
 #include "objects.h"
-
+#include "light_sources.h"
 //"Globals"
 mat4 projectionMatrix, worldToViewMatrix, modelToWorldMatrix, totMatrix;
 vec3 cam_pos,cam_dir,cam_speed;
@@ -17,9 +17,9 @@ GLint prevx,prevy;
 //Initialize Shading stuff
 GLuint basic_shading, skybox_shading, advanced_shading;
 //Make objects instead
-WorldObject* octagon;
-WorldObject* bunnyplus;
-WorldObject* skybox;
+WorldObject *octagon, *bunnyplus, *skybox;
+//LightSources
+LightSources* Lights;
 void init(void)
 {
 	// GL inits
@@ -36,6 +36,9 @@ void init(void)
 	octagon = new_object("Textures/maskros512.tga", "Models/octagon.obj", T(0,0,10));
 	bunnyplus = new_object("Textures/maskros512.tga", "Models/bunnyplus.obj", T(0,5,10));
 	skybox = new_object("Textures/SkyBox512.tga", "Models/skybox.obj",T(cam_pos.x,cam_pos.y,cam_pos.z));
+	//Make Light-Sources
+	Lights = lighting_heaven();
+
 	glutPostRedisplay();
 }
 
@@ -54,6 +57,7 @@ void display(void)
 	skybox->position = T(cam_pos.x,cam_pos.y,cam_pos.z);
 	render_object(skybox, &worldToViewMatrix, &projectionMatrix, &skybox_shading);
 	glEnable(GL_DEPTH_TEST);
+	apply_lighting(Lights, &advanced_shading);
 	//Draw other objects
 	render_object(octagon, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	render_object(bunnyplus, &worldToViewMatrix, &projectionMatrix, &advanced_shading);

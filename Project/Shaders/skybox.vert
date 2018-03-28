@@ -9,12 +9,14 @@ in vec2 inTexCoord;
 out vec2 texCoord;
 
 //Uniform
-uniform mat4 totMatrix;
+uniform mat4 modelToWorldMatrix;
+uniform mat4 worldToViewMatrix;
+uniform mat4 projectionMatrix;
 uniform sampler2D texUnit;
 
 
 void main(void)
 {
 	texCoord = inTexCoord;
-	gl_Position = totMatrix*vec4(inPosition, 1.0);
+	gl_Position = projectionMatrix*worldToViewMatrix*modelToWorldMatrix*vec4(inPosition, 1.0);
 }

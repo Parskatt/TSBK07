@@ -13,13 +13,14 @@
 typedef struct LightSources LightSources;
 
 struct LightSources{
-  point3D positions[];
-  point3D colors[];
-  GLuint attenuation[];
-  GLuint id;
+  Point3D positions[2];
+  Point3D colors[2];
+  GLuint attenuation[2];
+  //GLuint id;
 };
 
-LightSources* LightingHeaven();
-LightSources* LightingHell();
+LightSources* lighting_heaven();
+LightSources* lighting_hell();
+void apply_lighting(LightSources* Lights, GLuint* shader);
 
 #endif //LIGHT_SOURCES_H
