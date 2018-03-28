@@ -1,5 +1,5 @@
 #include "objects.h"
-
+//TODO add the specular component to the object maybe something else as well.
 WorldObject* new_object(char* texture, char* model, mat4 pos) {
   WorldObject* p = malloc(sizeof(WorldObject));
   LoadTGATextureSimple(texture, &p->texture_id);

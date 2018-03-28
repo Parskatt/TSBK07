@@ -16,12 +16,10 @@ vec3 cam_pos,cam_dir,cam_speed;
 GLint prevx,prevy;
 //Initialize Shading stuff
 GLuint basic_shading, skybox_shading, advanced_shading;
-//Initialize Model stuff
-Model *octa, *skybox;
-//Init textures TODO dont do it like this pls
-GLuint skyTex;
 //Make objects instead
-WorldObject* object;
+WorldObject* octagon;
+WorldObject* bunnyplus;
+WorldObject* skybox;
 void init(void)
 {
 	// GL inits
@@ -34,13 +32,10 @@ void init(void)
 	load_shaders(&basic_shading,&skybox_shading, &advanced_shading);	// Load and compile shader
 	//Camera init
 	camera_init(&cam_pos,&cam_dir,&projectionMatrix,&worldToViewMatrix);
-	// Load models
-	octa = LoadModelPlus("Models/octagon.obj");
-	skybox = LoadModelPlus("Models/skybox.obj");
-	//Textures?
-	LoadTGATextureSimple("Textures/SkyBox512.tga", &skyTex);
-	//Make world object cause this is much cooler. Constructor which Loads the associated TGA-file, object file and position.
-	object = new_object("Textures/maskros512.tga", "Models/octagon.obj", T(0,0,10));
+	//Make objects
+	octagon = new_object("Textures/maskros512.tga", "Models/octagon.obj", T(0,0,10));
+	bunnyplus = new_object("Textures/maskros512.tga", "Models/bunnyplus.obj", T(0,5,10));
+	skybox = new_object("Textures/SkyBox512.tga", "Models/skybox.obj",T(cam_pos.x,cam_pos.y,cam_pos.z));
 	glutPostRedisplay();
 }
 
@@ -56,31 +51,12 @@ void display(void)
 
 	//Draw the skybox
 	glDisable(GL_DEPTH_TEST);
-	glUseProgram(skybox_shading);
-	//TODO dont bind every time, only bind when it is necessary
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, skyTex);
-	glUniform1i(glGetUniformLocation(skybox_shading, "texUnit"), GL_TEXTURE1);
-	modelToWorldMatrix = T(cam_pos.x,cam_pos.y,cam_pos.z);
-	totMatrix = Mult(projectionMatrix,Mult(worldToViewMatrix,modelToWorldMatrix));
-	glUniformMatrix4fv(glGetUniformLocation(skybox_shading, "totMatrix"), 1, GL_TRUE, totMatrix.m);
-	DrawModel(skybox, skybox_shading, "inPosition", "inNormal", "inTexCoord");
+	skybox->position = T(cam_pos.x,cam_pos.y,cam_pos.z);
+	render_object(skybox, &worldToViewMatrix, &projectionMatrix, &skybox_shading);
 	glEnable(GL_DEPTH_TEST);
-	//Draw using object container
-	render_object(object, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	//Draw other objects
-	/*glUseProgram(basic_shading); //program used when drawing octagon
-	modelToWorldMatrix = T(0,0,10);
-	totMatrix = Mult(projectionMatrix,Mult(worldToViewMatrix,modelToWorldMatrix));
-	glUniformMatrix4fv(glGetUniformLocation(basic_shading, "totMatrix"), 1, GL_TRUE, totMatrix.m);
-	DrawModel(octa, basic_shading, "inPosition", "inNormal", "inTexCoord");*/
-
-	/*glUseProgram(basic_shading); //program used when drawing octagon
-	modelToWorldMatrix = object.position;
-	totMatrix = Mult(projectionMatrix,Mult(worldToViewMatrix,modelToWorldMatrix));
-	glUniformMatrix4fv(glGetUniformLocation(basic_shading, "totMatrix"), 1, GL_TRUE, totMatrix.m);
-	DrawModel(object.model_ptr, basic_shading, "inPosition", "inNormal", "inTexCoord");
-*/
+	render_object(octagon, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
+	render_object(bunnyplus, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	glutSwapBuffers();
 }
 
