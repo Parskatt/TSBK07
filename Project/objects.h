@@ -24,6 +24,6 @@ struct WorldObject{
 };
 
 WorldObject* new_object(char* texture, char* model, mat4 value);
-void render_object(WorldObject* object, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader);
+void render_object(WorldObject* object, mat4 worldToViewMatrix, mat4* projectionMatrix, GLuint* shader, GLint i);
 
 #endif //OBJECTS_H

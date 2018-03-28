@@ -10,7 +10,7 @@ void camera_init(vec3 *cam_pos,vec3 *cam_dir,mat4 *projectionMatrix,mat4 *worldT
 
 void keyboard(unsigned char c, int x, int y, mat4* worldToViewMatrix, vec3* cam_pos, vec3* cam_dir)
 {
-	static float a = 0.05;
+	static float a = 0.5;
 	vec3 direction = SetVector(0,0,0);
 	switch (c)
 	{

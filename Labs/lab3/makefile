@@ -1,5 +1,5 @@
 # set this variable to the director in which you saved the common files
-commondir = ../common/
+commondir = ../../common/
 
 all : lab3-1 lab3-2 lab3-3 lab3-4 lab3-5
 
