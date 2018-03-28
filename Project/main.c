@@ -17,9 +17,10 @@ GLint prevx,prevy;
 //Initialize Shading stuff
 GLuint basic_shading, skybox_shading, advanced_shading;
 //Initialize Model stuff
-Model *octa;
 //Make objects instead
-WorldObject *object, *skybox, *ground;
+//WorldObject *octagon, *skybox, *ground, *bunny;
+WorldObject *skybox;
+ObjectList *created_objects;
 void init(void)
 {
 	// GL inits
@@ -36,9 +37,14 @@ void init(void)
 	//LoadTGATextureSimple("Textures/SkyBox512.tga", &skyTex);
 	//Make world object cause this is much cooler. Constructor which Loads the associated TGA-file, object file and position.
 
-	object = new_object("Textures/maskros512.tga", "Models/octagon.obj", T(0,0,10));
-	ground = new_object("Textures/lava.tga", "Models/ground.obj", T(0,0,0));
+
+	//octagon = new_object("Textures/maskros512.tga", "Models/octagon.obj", T(0,0,10));
+	//ground = new_object("Textures/lava.tga", "Models/ground.obj", T(0,0,0));
 	skybox = new_object("Textures/SkyBox512.tga", "Models/skybox.obj", T(0,0,0));
+	//bunny = new_object("Textures/girl-head.tga", "Models/bunnyplus.obj", T(0,10,10));
+
+	created_objects = create_objects();
+
 	glutPostRedisplay();
 }
 
@@ -55,12 +61,15 @@ void display(void)
 	//Draw the skybox
 
 	glDisable(GL_DEPTH_TEST);
-	render_object(skybox, worldToViewMatrix, &projectionMatrix, &skybox_shading, 0);
+	render_skybox(skybox, worldToViewMatrix, &projectionMatrix, &skybox_shading);
 
 	glEnable(GL_DEPTH_TEST);
 	//Draw using object container
-	render_object(ground, worldToViewMatrix, &projectionMatrix, &advanced_shading, 1);
-	render_object(object, worldToViewMatrix, &projectionMatrix, &advanced_shading, 1);
+	//render_object(ground, worldToViewMatrix, &projectionMatrix, &advanced_shading, 1);
+	//render_object(octagon, worldToViewMatrix, &projectionMatrix, &advanced_shading, 1);
+	//render_object(bunny, worldToViewMatrix, &projectionMatrix, &advanced_shading, 1);
+
+	render_objects(created_objects, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 
 	glutSwapBuffers();
 }

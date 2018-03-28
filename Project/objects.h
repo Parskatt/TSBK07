@@ -16,6 +16,7 @@
 #define ADVANCED_SHADING 2
 
 typedef struct WorldObject WorldObject;
+typedef struct ObjectList ObjectList;
 
 struct WorldObject{
   mat4 position;
@@ -23,7 +24,15 @@ struct WorldObject{
   GLuint texture_id;
 };
 
+struct ObjectList{
+	int hej;
+	WorldObject* obj_list[];
+};
+
 WorldObject* new_object(char* texture, char* model, mat4 value);
-void render_object(WorldObject* object, mat4 worldToViewMatrix, mat4* projectionMatrix, GLuint* shader, GLint i);
+void render_object(WorldObject* object, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader);
+void render_skybox(WorldObject* object, mat4 worldToViewMatrix, mat4* projectionMatrix, GLuint* shader);
+ObjectList* create_objects();
+void render_objects(ObjectList* objects, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader);
 
 #endif //OBJECTS_H
