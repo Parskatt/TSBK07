@@ -9,18 +9,30 @@
 #include "VectorUtils3.h"
 
 //Struct for light_sources in a certain area
-
+typedef struct PointLight PointLight;
 typedef struct LightSources LightSources;
 
+struct PointLight {
+	  //Position of light
+    vec3 position;
+    //Attenuation of light
+    float constant;
+    float linear;
+    float quadratic;
+		//Lighting components
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
 struct LightSources{
-  Point3D positions[2];
-  Point3D colors[2];
-  GLuint attenuation[2];
+
+	PointLight pointlights[4];
+	DirLight dirlight;
   //GLuint id;
 };
 
 LightSources* lighting_heaven();
 LightSources* lighting_hell();
-void apply_lighting(LightSources* Lights, GLuint* shader);
+//void apply_lighting(LightSources* Lights, GLuint* shader);
 
 #endif //LIGHT_SOURCES_H
