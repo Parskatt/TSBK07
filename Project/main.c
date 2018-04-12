@@ -9,6 +9,7 @@
 #include "cameramovement.h"
 #include "load_shaders.h"
 #include "objects.h"
+#include "terrain.h"
 
 //"Globals"
 mat4 projectionMatrix, worldToViewMatrix, modelToWorldMatrix, totMatrix;
@@ -19,8 +20,10 @@ GLuint basic_shading, skybox_shading, advanced_shading;
 //Initialize Model stuff
 //Make objects instead
 //WorldObject *octagon, *skybox, *ground, *bunny;
+TerrainObject *terrain_l,*terrain_h;
 WorldObject *skybox;
 ObjectList *created_objects;
+
 void init(void)
 {
 	// GL inits
@@ -41,6 +44,8 @@ void init(void)
 	//octagon = new_object("Textures/maskros512.tga", "Models/octagon.obj", T(0,0,10));
 	//ground = new_object("Textures/lava.tga", "Models/ground.obj", T(0,0,0));
 	skybox = new_object("Textures/SkyBox512.tga", "Models/skybox.obj", T(0,0,0));
+	terrain_l = new_terrain("Textures/dirt.tga", T(0,0,0), 100);
+	terrain_h = new_terrain("Textures/lava.tga", T(0,0,0), -100);
 	//bunny = new_object("Textures/girl-head.tga", "Models/bunnyplus.obj", T(0,10,10));
 
 	created_objects = create_objects();
@@ -69,6 +74,8 @@ void display(void)
 	//render_object(octagon, worldToViewMatrix, &projectionMatrix, &advanced_shading, 1);
 	//render_object(bunny, worldToViewMatrix, &projectionMatrix, &advanced_shading, 1);
 
+	render_terrain(terrain_l, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
+	render_terrain(terrain_h, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	render_objects(created_objects, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 
 	glutSwapBuffers();
