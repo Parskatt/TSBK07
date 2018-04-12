@@ -14,7 +14,7 @@ out vec3 SurfacePos;
 uniform mat4 modelToWorldMatrix;
 uniform mat4 worldToViewMatrix;
 uniform mat4 projectionMatrix;
-uniform sampler2D tex0, tex1;
+//uniform sampler2D tex0, tex1;
 
 
 void main(void)
@@ -22,5 +22,5 @@ void main(void)
 	TexCoord = inTexCoord;
 	Normal = inNormal;
 	SurfacePos = vec3(modelToWorldMatrix*vec4(inPosition, 1.0));
-	gl_Position = projectionMatrix*projectionMatrix*modelToWorldMatrix*vec4(inPosition, 1.0);
+	gl_Position = projectionMatrix*worldToViewMatrix*modelToWorldMatrix*vec4(inPosition, 1.0);
 }

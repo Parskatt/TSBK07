@@ -1,6 +1,8 @@
 #include "light_sources.h"
+
+
 PointLight* make_point_light(vec3 position,float constant,float linear,float quadratic,vec3 ambient,vec3 diffuse,vec3 specular){
-  PointLight* pt;
+  PointLight* pt = malloc(sizeof(PointLight));
   pt->position = position;
   pt->constant = constant;
   pt->linear = linear;
@@ -10,54 +12,65 @@ PointLight* make_point_light(vec3 position,float constant,float linear,float qua
   pt->specular = specular;
   return pt;
 }
-
-
-//This is ugly but it has to be done somewhere. (If you're really ambitious you could place this in a file and read from file)
-LightSources* lighting_hell(){
-  LightSources* lights;
-  lights->positions = { {10.0f, 5.0f, 0.0f}, // Red light, positional
-                              {0.0f, 5.0f, 10.0f}}; // Yellow light, positional
-  lights->colors = { {1.0f, 0.0f, 0.0f}, // Red light, positional
-                              {1.0f, 1.0f, 0.0f}};
-  lights->attenuation = {0.5,0.01};
-  return lights;
+DirLight* make_dir_light(vec3 direction,vec3 ambient,vec3 diffuse,vec3 specular){
+  DirLight* pt = malloc(sizeof(DirLight));
+  pt->direction = direction;
+  pt->ambient = ambient;
+  pt->diffuse = diffuse;
+  pt->specular = specular;
+  return pt;
 }
 
+
+//This is ugly but it has to be done somewhere.
+LightSources* lighting_hell(){
+  LightSources* lights = malloc(sizeof(LightSources));
+  lights->pointlights[0] = *make_point_light(SetVector(0.0,0.0,0.0),1.0,0.0,0.0,SetVector(1.0,0.0,0.0),SetVector(1.0,0.0,0.0),SetVector(1.0,0.0,0.0));//Red light
+  lights->pointlights[1] = *make_point_light(SetVector(1.0,0.0,0.0),1.0,0.0,0.0,SetVector(0.0,1.0,0.0),SetVector(0.0,1.0,0.0),SetVector(0.0,1.0,0.0));//Green light
+  lights->pointlights[2] = *make_point_light(SetVector(2.0,0.0,0.0),1.0,0.0,0.0,SetVector(0.0,0.0,1.0),SetVector(0.0,0.0,1.0),SetVector(0.0,0.0,1.0));//Blue light
+  lights->pointlights[3] = *make_point_light(SetVector(3.0,0.0,0.0),1.0,0.0,0.0,SetVector(1.0,0.0,1.0),SetVector(1.0,0.0,1.0),SetVector(1.0,0.0,1.0));//Magenta light
+  lights->dirlight = *make_dir_light(SetVector(1.0,1.0,1.0),SetVector(1.0,1.0,1.0),SetVector(1.0,1.0,1.0),SetVector(1.0,1.0,1.0)); //White light
+  return lights;
+}
 LightSources* lighting_heaven(){
-  LightSources* lights;
-  lights->positions = { {10.0f, 5.0f, 0.0f}, // Red light, positional
-                              {0.0f, 5.0f, 10.0f}}; // Yellow light, positional
-  lights->colors = { {0.0f, 0.0f, 1.0f}, // Blue light, positional
-                              {1.0f, 1.0f, 1.0f}}; //White light
-  lights->attenuation = {0.5,0.01};
+  LightSources* lights = malloc(sizeof(LightSources));
+  // lights->positions = { {10.0f, 5.0f, 0.0f}, // Red light, positional
+  //                             {0.0f, 5.0f, 10.0f}}; // Yellow light, positional
+  // lights->colors = { {0.0f, 0.0f, 1.0f}, // Blue light, positional
+  //                             {1.0f, 1.0f, 1.0f}}; //White light
+  // lights->attenuation = {0.5,0.01};
   return lights;
 };
-void apply_lighting(LightSources* Lights, GLuint* shader){
-  glUniform3fv(glGetUniformLocation(*shader, "LightPos"), 2, &LightPos[0].x);
-	glUniform3fv(glGetUniformLocation(*shader, "LightColor"), 2, &LightColor[0].x);
+void apply_lighting(LightSources* lights, GLuint* shader){
+  //Positional lights
   for (int i = 0; i < 4; i++)
-{
-  char buffer[64];
+  {
+    char buffer[64];
 
-  sprintf(buffer, "pointLights[%i].position", i);
-  setUniformVec3(lightingShader, buffer, &Lights->PointLights[i].position.x); //Lul
+    sprintf(buffer, "pointLights[%i].position", i);
+    glUniform3fv(glGetUniformLocation(*shader, buffer), 1, &lights->pointlights[i].position.x);
 
-  sprintf(buffer, "pointLights[%i].constant", i);
-  setUniformFloat(lightingShader, buffer, 1.0f);
+    sprintf(buffer, "pointLights[%i].constant", i);
+    glUniform1f(glGetUniformLocation(*shader, buffer), lights->pointlights[i].constant);
 
-  sprintf(buffer, "pointLights[%i].linear", i);
-  setUniformFloat(lightingShader, buffer, 0.09f);
+    sprintf(buffer, "pointLights[%i].linear", i);
+    glUniform1f(glGetUniformLocation(*shader, buffer), lights->pointlights[i].linear);
 
-  sprintf(buffer, "pointLights[%i].qaudratic", i);
-  setUniformFloat(lightingShader, buffer, 0.032f);
+    sprintf(buffer, "pointLights[%i].qaudratic", i);
+    glUniform1f(glGetUniformLocation(*shader, buffer), lights->pointlights[i].quadratic);
 
-  sprintf(buffer, "pointLights[%i].diffuse", i);
-  setUniformVec3(lightingShader, buffer, pointLightColors[i]);
+    sprintf(buffer, "pointLights[%i].ambient", i);
+    glUniform3fv(glGetUniformLocation(*shader, buffer), 1, &lights->pointlights[i].ambient.x);
 
-  sprintf(buffer, "pointLights[%i].specular", i);
-  setUniformVec3(lightingShader, buffer, glm::vec3(0.0f));
+    sprintf(buffer, "pointLights[%i].diffuse", i);
+    glUniform3fv(glGetUniformLocation(*shader, buffer), 1, &lights->pointlights[i].diffuse.x);
 
-  sprintf(buffer, "pointLights[%i].specular", i);
-  setUniformVec3(lightingShader, buffer, glm::vec3(1.0f));
-}
+    sprintf(buffer, "pointLights[%i].specular", i);
+    glUniform3fv(glGetUniformLocation(*shader, buffer), 1, &lights->pointlights[i].specular.x);
+  }
+  //Directional lights
+  glUniform3fv(glGetUniformLocation(*shader, "dirLight.direction"), 1, &lights->dirlight.direction.x);
+  glUniform3fv(glGetUniformLocation(*shader, "dirLight.ambient"), 1, &lights->dirlight.ambient.x);
+  glUniform3fv(glGetUniformLocation(*shader, "dirLight.diffuse"), 1, &lights->dirlight.diffuse.x);
+  glUniform3fv(glGetUniformLocation(*shader, "dirLight.specular"), 1, &lights->dirlight.specular.x);
 }

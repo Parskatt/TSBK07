@@ -19,7 +19,7 @@ GLuint basic_shading, skybox_shading, advanced_shading;
 //Make objects instead
 WorldObject *octagon, *bunnyplus, *skybox;
 //LightSources
-LightSources* Lights;
+LightSources* lights;
 void init(void)
 {
 	// GL inits
@@ -37,7 +37,7 @@ void init(void)
 	bunnyplus = new_object("Textures/maskros512.tga", "Models/bunnyplus.obj", T(0,5,10));
 	skybox = new_object("Textures/SkyBox512.tga", "Models/skybox.obj",T(cam_pos.x,cam_pos.y,cam_pos.z));
 	//Make Light-Sources
-	Lights = lighting_heaven();
+	lights = lighting_hell();
 
 	glutPostRedisplay();
 }
@@ -57,11 +57,15 @@ void display(void)
 	skybox->position = T(cam_pos.x,cam_pos.y,cam_pos.z);
 	render_object(skybox, &worldToViewMatrix, &projectionMatrix, &skybox_shading);
 	glEnable(GL_DEPTH_TEST);
-	apply_lighting(Lights, &advanced_shading);
+	//Apply lighting
+	apply_lighting(lights, &advanced_shading);
+	//TODO Dont insert viewPos here was just tired and wanted it to work
+	glUniform3fv(glGetUniformLocation(advanced_shading, "viewPos"),1,&cam_pos.x);
 	//Draw other objects
 	render_object(octagon, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	render_object(bunnyplus, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	glutSwapBuffers();
+	glutPostRedisplay();
 }
 
 void mousefunc(int button, int state, int x, int y)
