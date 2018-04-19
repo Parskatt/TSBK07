@@ -1,18 +1,6 @@
 #include "objects.h"
 
-
-
-WorldObject* new_object(GLuint tex_id, Model* model, mat4 pos) {
-  WorldObject* p = malloc(sizeof(WorldObject));
-  //LoadTGATextureSimple(texture, &p->texture_id);
-  //p->model_ptr = LoadModelPlus(model);
-  p->texture_id = tex_id;
-  p->model_ptr = model;
-  p->position = pos;
-  return p;
-}
-
-WorldObject* new_skybox(char* texture, char* model, mat4 pos) {
+WorldObject* new_object(char* texture, char* model, mat4 pos) {
   WorldObject* p = malloc(sizeof(WorldObject));
   LoadTGATextureSimple(texture, &p->texture_id);
   p->model_ptr = LoadModelPlus(model);
@@ -49,12 +37,12 @@ void render_skybox(WorldObject* object, mat4 worldToViewMatrix, mat4* projection
 
 
 
-ObjectList* create_objects(TextureList* textures, ModelList* models)
+ObjectList* create_objects()
 {
   ObjectList* out_list = malloc(sizeof(ObjectList));
-  out_list->obj_list[0] = new_object(textures->texture_list[0], models->model_list[0], T(0,10,10));
+  out_list->obj_list[0] = new_object("Textures/girl-head.tga", "Models/bunnyplus.obj", T(0,10,10));
   //out_list->obj_list[1] = new_object("Textures/lava.tga", "Models/ground.obj", T(0,0,0));
-  out_list->obj_list[1] = new_object(textures->texture_list[0], models->model_list[1], T(0,0,10));
+  out_list->obj_list[1] = new_object("Textures/maskros512.tga", "Models/octagon.obj", T(0,0,10));
   //out_list->obj_list[3] = new_object("Textures/maskros512.tga", "Models/platform1.obj", T(0,0,0));
   return out_list;
 }
@@ -74,23 +62,43 @@ void render_objects(ObjectList* objects, mat4* worldToViewMatrix, mat4* projecti
 }
 
 
-ModelList* load_models()
-{
-  ModelList* out_list = malloc(sizeof(ModelList));
-  out_list->model_list[0] = LoadModelPlus("Models/bunnyplus.obj");
-  out_list->model_list[1] = LoadModelPlus("Models/octagon.obj");
+//h-file
+#ifndef OBJECTS_H
+#define OBJECTS_H
 
-  out_list->size = 2;
-  return out_list;
-}
+#ifdef __APPLE__
+	#include <OpenGL/gl3.h>
+#endif
+#include "MicroGlut.h"
+#include "GL_utilities.h"
+#include "VectorUtils3.h"
+#include "loadobj.h"
+#include "LoadTGA.h"
 
-TextureList* load_textures()
-{
-  TextureList* out_list = malloc(sizeof(TextureList));
-  LoadTGATextureSimple("Textures/maskros512.tga", &out_list->texture_list[0]);
-  LoadTGATextureSimple("Textures/lava.tga", &out_list->texture_list[1]);
-  LoadTGATextureSimple("Textures/kt_rock_1f_dk.tga", &out_list->texture_list[2]);
+//Define stuff for more advanced renderer
+#define SKYBOX_SHADING 0
+#define BASIC_SHADING 1
+#define ADVANCED_SHADING 2
 
-  out_list->size = 3;
-  return out_list;
-}
+typedef struct WorldObject WorldObject;
+typedef struct ObjectList ObjectList;
+
+
+struct WorldObject{
+  mat4 position;
+  Model* model_ptr;
+  GLuint texture_id;
+};
+
+struct ObjectList{
+	int hej;
+	WorldObject* obj_list[];
+};
+
+WorldObject* new_object(char* texture, char* model, mat4 value);
+void render_object(WorldObject* object, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader);
+void render_skybox(WorldObject* object, mat4 worldToViewMatrix, mat4* projectionMatrix, GLuint* shader);
+ObjectList* create_objects();
+void render_objects(ObjectList* objects, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader);
+
+#endif //OBJECTS_H

@@ -20,9 +20,11 @@ GLuint basic_shading, skybox_shading, advanced_shading;
 //Initialize Model stuff
 //Make objects instead
 //WorldObject *octagon, *skybox, *ground, *bunny;
-TerrainObject *terrain_l,*terrain_h;
+TerrainObject *terrain_l,*terrain_h,*terrain_above;
 WorldObject *skybox;
 ObjectList *created_objects;
+ModelList *models;
+TextureList *textures;
 
 void init(void)
 {
@@ -43,12 +45,16 @@ void init(void)
 
 	//octagon = new_object("Textures/maskros512.tga", "Models/octagon.obj", T(0,0,10));
 	//ground = new_object("Textures/lava.tga", "Models/ground.obj", T(0,0,0));
-	skybox = new_object("Textures/SkyBox512.tga", "Models/skybox.obj", T(0,0,0));
-	terrain_l = new_terrain("Textures/dirt.tga", T(0,0,0), 100);
-	terrain_h = new_terrain("Textures/lava.tga", T(0,0,0), -100);
+	skybox = new_skybox("Textures/SkyBox512.tga", "Models/skybox.obj", T(0,0,0));
+	terrain_l = new_terrain("Textures/kt_rock_1f_dk.tga", T(0,0,0), 100);
+	terrain_h = new_terrain("Textures/kt_rock_1f_dk.tga", T(0,0,0), -100);
+	//terrain_above = new_terrain("Textures/maskros512.tga", T(0,100,0), -100);
 	//bunny = new_object("Textures/girl-head.tga", "Models/bunnyplus.obj", T(0,10,10));
 
-	created_objects = create_objects();
+	models = load_models();
+	textures = load_textures();
+
+	created_objects = create_objects(textures,models);
 
 	glutPostRedisplay();
 }
@@ -76,6 +82,7 @@ void display(void)
 
 	render_terrain(terrain_l, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	render_terrain(terrain_h, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
+	//render_terrain(terrain_above, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	render_objects(created_objects, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 
 	glutSwapBuffers();
