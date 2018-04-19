@@ -8,7 +8,7 @@ in vec2 inTexCoord;
 //Out
 out vec2 TexCoord;
 out vec3 Normal;
-out vec3 SurfacePos;
+out vec3 SurfPos;
 
 //Uniform
 uniform mat4 modelToWorldMatrix;
@@ -20,7 +20,7 @@ uniform mat4 projectionMatrix;
 void main(void)
 {
 	TexCoord = inTexCoord;
-	Normal = inNormal;
-	SurfacePos = vec3(modelToWorldMatrix*vec4(inPosition, 1.0));
+	Normal = mat3(modelToWorldMatrix)*inNormal;
+	SurfPos = vec3(modelToWorldMatrix*vec4(inPosition, 1.0));
 	gl_Position = projectionMatrix*worldToViewMatrix*modelToWorldMatrix*vec4(inPosition, 1.0);
 }

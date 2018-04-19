@@ -43,6 +43,6 @@ PointLight* make_point_light(vec3 position,float constant,float linear,float qua
 DirLight* make_dir_light(vec3 direction,vec3 ambient,vec3 diffuse,vec3 specular);
 LightSources* lighting_heaven();
 LightSources* lighting_hell();
-void apply_lighting(LightSources* lights, GLuint* shader);
+void apply_lighting(LightSources* lights, GLuint* shader, vec3 cam_pos);
 
 #endif //LIGHT_SOURCES_H

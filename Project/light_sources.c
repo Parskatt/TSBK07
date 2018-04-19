@@ -25,24 +25,26 @@ DirLight* make_dir_light(vec3 direction,vec3 ambient,vec3 diffuse,vec3 specular)
 //This is ugly but it has to be done somewhere.
 LightSources* lighting_hell(){
   LightSources* lights = malloc(sizeof(LightSources));
-  lights->pointlights[0] = *make_point_light(SetVector(0.0,0.0,0.0),1.0,0.0,0.0,SetVector(1.0,0.0,0.0),SetVector(1.0,0.0,0.0),SetVector(1.0,0.0,0.0));//Red light
-  lights->pointlights[1] = *make_point_light(SetVector(1.0,0.0,0.0),1.0,0.0,0.0,SetVector(0.0,1.0,0.0),SetVector(0.0,1.0,0.0),SetVector(0.0,1.0,0.0));//Green light
-  lights->pointlights[2] = *make_point_light(SetVector(2.0,0.0,0.0),1.0,0.0,0.0,SetVector(0.0,0.0,1.0),SetVector(0.0,0.0,1.0),SetVector(0.0,0.0,1.0));//Blue light
-  lights->pointlights[3] = *make_point_light(SetVector(3.0,0.0,0.0),1.0,0.0,0.0,SetVector(1.0,0.0,1.0),SetVector(1.0,0.0,1.0),SetVector(1.0,0.0,1.0));//Magenta light
+  //Pos constant, linear, quadratic, ambient, diffuse, specular
+  lights->pointlights[0] = *make_point_light(SetVector(0.5,0.0,0.0),1.0,1.0,0.0,
+                            SetVector(0,0.0,0.0),SetVector(0.58,0.58,0.58),SetVector(5.0,0.0,0.0));//Red light
+  lights->pointlights[1] = *make_point_light(SetVector(1.0,0.0,0.0),1.0,1.0,0.0,
+                            SetVector(0.0,2,0.0),SetVector(0.0,1.0,0.0),SetVector(0.0,1.0,0.0));//Green light
+  lights->pointlights[2] = *make_point_light(SetVector(2.0,0.0,0.0),1.0,1.0,0.0,
+                            SetVector(0.0,0.0,2),SetVector(0.0,0.0,1.0),SetVector(0.0,0.0,1.0));//Blue light
+  lights->pointlights[3] = *make_point_light(SetVector(3.0,0.0,0.0),1.0,1.0,0.0,
+                            SetVector(2,0.0,2),SetVector(1.0,0.0,1.0),SetVector(1.0,0.0,1.0));//Magenta light
   lights->dirlight = *make_dir_light(SetVector(1.0,1.0,1.0),SetVector(1.0,1.0,1.0),SetVector(1.0,1.0,1.0),SetVector(1.0,1.0,1.0)); //White light
   return lights;
 }
 LightSources* lighting_heaven(){
   LightSources* lights = malloc(sizeof(LightSources));
-  // lights->positions = { {10.0f, 5.0f, 0.0f}, // Red light, positional
-  //                             {0.0f, 5.0f, 10.0f}}; // Yellow light, positional
-  // lights->colors = { {0.0f, 0.0f, 1.0f}, // Blue light, positional
-  //                             {1.0f, 1.0f, 1.0f}}; //White light
-  // lights->attenuation = {0.5,0.01};
   return lights;
 };
-void apply_lighting(LightSources* lights, GLuint* shader){
+void apply_lighting(LightSources* lights, GLuint* shader, vec3 cam_pos){
   //Positional lights
+  glUniform3fv(glGetUniformLocation(*shader, "viewPos"),1,&cam_pos.x);
+  glUseProgram(*shader);
   for (int i = 0; i < 4; i++)
   {
     char buffer[64];

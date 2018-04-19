@@ -33,7 +33,7 @@ void init(void)
 	//Camera init
 	camera_init(&cam_pos,&cam_dir,&projectionMatrix,&worldToViewMatrix);
 	//Make objects
-	octagon = new_object("Textures/maskros512.tga", "Models/octagon.obj", T(0,0,10));
+	octagon = new_object("Textures/maskros512.tga", "Models/octagon.obj", T(0,0,7));
 	bunnyplus = new_object("Textures/maskros512.tga", "Models/bunnyplus.obj", T(0,5,10));
 	skybox = new_object("Textures/SkyBox512.tga", "Models/skybox.obj",T(cam_pos.x,cam_pos.y,cam_pos.z));
 	//Make Light-Sources
@@ -58,9 +58,8 @@ void display(void)
 	render_object(skybox, &worldToViewMatrix, &projectionMatrix, &skybox_shading);
 	glEnable(GL_DEPTH_TEST);
 	//Apply lighting
-	apply_lighting(lights, &advanced_shading);
+	apply_lighting(lights, &advanced_shading,cam_pos);
 	//TODO Dont insert viewPos here was just tired and wanted it to work
-	glUniform3fv(glGetUniformLocation(advanced_shading, "viewPos"),1,&cam_pos.x);
 	//Draw other objects
 	render_object(octagon, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	render_object(bunnyplus, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
