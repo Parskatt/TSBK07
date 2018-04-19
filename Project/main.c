@@ -11,6 +11,8 @@
 #include "objects.h"
 #include "terrain.h"
 
+
+#include "light_sources.h"
 //"Globals"
 mat4 projectionMatrix, worldToViewMatrix, modelToWorldMatrix, totMatrix;
 vec3 cam_pos,cam_dir,cam_speed;
@@ -26,6 +28,7 @@ ObjectList *created_objects;
 ModelList *models;
 TextureList *textures;
 
+
 void init(void)
 {
 	// GL inits
@@ -38,7 +41,6 @@ void init(void)
 	load_shaders(&basic_shading,&skybox_shading, &advanced_shading);	// Load and compile shader
 	//Camera init
 	camera_init(&cam_pos,&cam_dir,&projectionMatrix,&worldToViewMatrix);
-
 	//LoadTGATextureSimple("Textures/SkyBox512.tga", &skyTex);
 	//Make world object cause this is much cooler. Constructor which Loads the associated TGA-file, object file and position.
 
@@ -71,8 +73,7 @@ void display(void)
 
 	//Draw the skybox
 
-	glDisable(GL_DEPTH_TEST);
-	render_skybox(skybox, worldToViewMatrix, &projectionMatrix, &skybox_shading);
+	glDisable(GL_DEPTH_TEST);	render_skybox(skybox, worldToViewMatrix, &projectionMatrix, &skybox_shading);
 
 	glEnable(GL_DEPTH_TEST);
 	//Draw using object container
@@ -85,7 +86,9 @@ void display(void)
 	//render_terrain(terrain_above, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	render_objects(created_objects, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 
+
 	glutSwapBuffers();
+	glutPostRedisplay();
 }
 
 void mousefunc(int button, int state, int x, int y)

@@ -1,4 +1,5 @@
 #include "objects.h"
+<<<<<<< HEAD
 
 
 
@@ -19,15 +20,17 @@ WorldObject* new_skybox(char* texture, char* model, mat4 pos) {
   p->position = pos;
   return p;
 }
-
 void render_object(WorldObject* object, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader){
   //Hopefully this will make rendercalls much less space wasting in the main loop :^)
-  mat4 totMatrix;
   glUseProgram(*shader); //program used when drawing octagon
-	totMatrix = Mult(*projectionMatrix,Mult(*worldToViewMatrix,object->position));
-	glUniformMatrix4fv(glGetUniformLocation(*shader, "totMatrix"), 1, GL_TRUE, totMatrix.m);
+  //Send matrices to shader
+  glUniformMatrix4fv(glGetUniformLocation(*shader, "modelToWorldMatrix"), 1, GL_TRUE, object->position.m);
+	glUniformMatrix4fv(glGetUniformLocation(*shader, "worldToViewMatrix"), 1, GL_TRUE, worldToViewMatrix->m);
+  glUniformMatrix4fv(glGetUniformLocation(*shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix->m);
+  //Send textures to shader
   glUniform1i(glGetUniformLocation(*shader, "texUnit"), GL_TEXTURE0);//Right now texture 0 is hardcoded, change later
   glBindTexture(GL_TEXTURE_2D, object->texture_id);//Maybe dont bind every time? (Karin pls fix)
+  //Draw the model
 	DrawModel(object->model_ptr, *shader, "inPosition", "inNormal", "inTexCoord");
 }
 

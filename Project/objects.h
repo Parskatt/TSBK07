@@ -9,8 +9,9 @@
 #include "VectorUtils3.h"
 #include "loadobj.h"
 #include "LoadTGA.h"
+#include "light_sources.h"
 
-//Define stuff for more advanced renderer
+//Define stuff for more advanced renderer maybe lul
 #define SKYBOX_SHADING 0
 #define BASIC_SHADING 1
 #define ADVANCED_SHADING 2
