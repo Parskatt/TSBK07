@@ -20,6 +20,7 @@ GLint prevx,prevy;
 //Initialize Shading stuff
 GLuint basic_shading, skybox_shading, advanced_shading;
 //Initialize Model stuff
+<<<<<<< HEAD
 //Make objects instead
 //WorldObject *octagon, *skybox, *ground, *bunny;
 TerrainObject *terrain_l,*terrain_h,*terrain_above;
@@ -37,7 +38,7 @@ void init(void)
 	glDisable(GL_CULL_FACE);
 	printError("GL inits");
 
-	//Load Shaders
+	//Load Shaders	
 	load_shaders(&basic_shading,&skybox_shading, &advanced_shading);	// Load and compile shader
 	//Camera init
 	camera_init(&cam_pos,&cam_dir,&projectionMatrix,&worldToViewMatrix);
@@ -65,6 +66,7 @@ void display(void)
 {
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+<<<<<<< HEAD
 
 	//Draw the skybox
 	glDisable(GL_DEPTH_TEST);
@@ -112,7 +114,6 @@ int main(int argc, char **argv)
 	glutKeyboardFunc(&keyboardfunc);
 
 	glutTimerFunc(10, &timer, 0);
-
 	glutMainLoop();
 	exit(0);
 }
