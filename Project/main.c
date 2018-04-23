@@ -10,9 +10,8 @@
 #include "load_shaders.h"
 #include "objects.h"
 #include "terrain.h"
-
-
 #include "light_sources.h"
+
 //"Globals"
 mat4 projectionMatrix, worldToViewMatrix, modelToWorldMatrix, totMatrix;
 vec3 cam_pos,cam_dir,cam_speed;
@@ -20,7 +19,6 @@ GLint prevx,prevy;
 //Initialize Shading stuff
 GLuint basic_shading, skybox_shading, advanced_shading;
 //Initialize Model stuff
-<<<<<<< HEAD
 //Make objects instead
 //WorldObject *octagon, *skybox, *ground, *bunny;
 TerrainObject *terrain_l,*terrain_h,*terrain_above;
@@ -66,8 +64,6 @@ void display(void)
 {
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-<<<<<<< HEAD
-
 	//Draw the skybox
 	glDisable(GL_DEPTH_TEST);
 	render_skybox(skybox, worldToViewMatrix, &projectionMatrix, &skybox_shading);
