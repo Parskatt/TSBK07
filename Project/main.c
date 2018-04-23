@@ -27,7 +27,7 @@ WorldObject *skybox;
 ObjectList *created_objects;
 ModelList *models;
 TextureList *textures;
-
+LightSources *lights;
 
 void init(void)
 {
@@ -41,23 +41,18 @@ void init(void)
 	load_shaders(&basic_shading,&skybox_shading, &advanced_shading);	// Load and compile shader
 	//Camera init
 	camera_init(&cam_pos,&cam_dir,&projectionMatrix,&worldToViewMatrix);
-	//LoadTGATextureSimple("Textures/SkyBox512.tga", &skyTex);
-	//Make world object cause this is much cooler. Constructor which Loads the associated TGA-file, object file and position.
-
-
-	//octagon = new_object("Textures/maskros512.tga", "Models/octagon.obj", T(0,0,10));
-	//ground = new_object("Textures/lava.tga", "Models/ground.obj", T(0,0,0));
+	//Lights init
+	lights = lighting_hell();
+	//Skybox init
 	skybox = new_skybox("Textures/SkyBox512.tga", "Models/skybox.obj", T(0,0,0));
+	//Terrain and other models init
 	terrain_l = new_terrain("Textures/kt_rock_1f_dk.tga", T(0,0,0), 100);
 	terrain_h = new_terrain("Textures/kt_rock_1f_dk.tga", T(0,0,0), -100);
-	//terrain_above = new_terrain("Textures/maskros512.tga", T(0,100,0), -100);
-	//bunny = new_object("Textures/girl-head.tga", "Models/bunnyplus.obj", T(0,10,10));
-
 	models = load_models();
+	//Textures init
 	textures = load_textures();
-
+	//Create objects
 	created_objects = create_objects(textures,models);
-
 	glutPostRedisplay();
 }
 
@@ -72,21 +67,16 @@ void display(void)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//Draw the skybox
-
-	glDisable(GL_DEPTH_TEST);	render_skybox(skybox, worldToViewMatrix, &projectionMatrix, &skybox_shading);
-
+	glDisable(GL_DEPTH_TEST);
+	render_skybox(skybox, worldToViewMatrix, &projectionMatrix, &skybox_shading);
 	glEnable(GL_DEPTH_TEST);
-	//Draw using object container
-	//render_object(ground, worldToViewMatrix, &projectionMatrix, &advanced_shading, 1);
-	//render_object(octagon, worldToViewMatrix, &projectionMatrix, &advanced_shading, 1);
-	//render_object(bunny, worldToViewMatrix, &projectionMatrix, &advanced_shading, 1);
-
+	//Draw everything else, begin with applying lighting to shaders
+	apply_lighting(lights, &advanced_shading, cam_pos);
 	render_terrain(terrain_l, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	render_terrain(terrain_h, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
-	//render_terrain(terrain_above, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	render_objects(created_objects, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 
-
+	//Swap buffers to get new stuff out, redisplay to init next update.
 	glutSwapBuffers();
 	glutPostRedisplay();
 }

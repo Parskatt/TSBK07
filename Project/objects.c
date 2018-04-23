@@ -1,12 +1,7 @@
 #include "objects.h"
-<<<<<<< HEAD
-
-
 
 WorldObject* new_object(GLuint tex_id, Model* model, mat4 pos) {
   WorldObject* p = malloc(sizeof(WorldObject));
-  //LoadTGATextureSimple(texture, &p->texture_id);
-  //p->model_ptr = LoadModelPlus(model);
   p->texture_id = tex_id;
   p->model_ptr = model;
   p->position = pos;
