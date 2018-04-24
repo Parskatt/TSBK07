@@ -9,6 +9,7 @@
 #include "cameramovement.h"
 #include "load_shaders.h"
 #include "objects.h"
+#include "skybox.h"
 #include "terrain.h"
 #include "light_sources.h"
 
@@ -22,7 +23,7 @@ GLuint basic_shading, skybox_shading, advanced_shading;
 //Make objects instead
 //WorldObject *octagon, *skybox, *ground, *bunny;
 TerrainObject *terrain_l,*terrain_h,*terrain_above;
-WorldObject *skybox;
+SkyBoxObject *skybox[6];
 ObjectList *created_objects;
 ModelList *models;
 TextureList *textures;
@@ -36,14 +37,14 @@ void init(void)
 	glDisable(GL_CULL_FACE);
 	printError("GL inits");
 
-	//Load Shaders	
+	//Load Shaders
 	load_shaders(&basic_shading,&skybox_shading, &advanced_shading);	// Load and compile shader
 	//Camera init
 	camera_init(&cam_pos,&cam_dir,&projectionMatrix,&worldToViewMatrix);
 	//Lights init
 	lights = lighting_hell();
 	//Skybox init
-	skybox = new_skybox("Textures/SkyBox512.tga", "Models/skybox.obj", T(0,0,0));
+	make_skybox_object(skybox, "Textures/dirt.tga", "Textures/skybox/sunset2.tga", "Textures/skybox/sunset3.tga", "Textures/skybox/sunset4.tga", "Textures/skybox/sunset5.tga", "Textures/skybox/sunset6.tga");
 	//Terrain and other models init
 	terrain_l = new_terrain("Textures/kt_rock_1f_dk.tga", T(0,0,0), 100);
 	terrain_h = new_terrain("Textures/kt_rock_1f_dk.tga", T(0,0,0), -100);
@@ -65,9 +66,7 @@ void display(void)
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//Draw the skybox
-	glDisable(GL_DEPTH_TEST);
 	render_skybox(skybox, worldToViewMatrix, &projectionMatrix, &skybox_shading);
-	glEnable(GL_DEPTH_TEST);
 	//Draw everything else, begin with applying lighting to shaders
 	apply_lighting(lights, &advanced_shading, cam_pos);
 	render_terrain(terrain_l, &worldToViewMatrix, &projectionMatrix, &advanced_shading);

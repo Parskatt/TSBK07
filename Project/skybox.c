@@ -117,10 +117,15 @@ void make_skybox_object(SkyBoxObject** skybox, char* texture1, char* texture2, c
 	}
 	printf("Loading texture %s\n", texture1);
 	skybox[0] = new_skybox(texture1, box[0], T(0,0,0));
+  printf("Loading texture %s\n", texture2);
 	skybox[1] = new_skybox(texture2, box[1], T(0,0,0));
+  printf("Loading texture %s\n", texture3);
 	skybox[2] = new_skybox(texture3, box[2], T(0,0,0));
+  printf("Loading texture %s\n", texture4);
 	skybox[3] = new_skybox(texture4, box[3], T(0,0,0));
+  printf("Loading texture %s\n", texture5);
 	skybox[4] = new_skybox(texture5, box[4], T(0,0,0));
+  printf("Loading texture %s\n", texture6);
 	skybox[5] = new_skybox(texture6, box[5], T(0,0,0));
 }
 
@@ -135,7 +140,7 @@ void draw_skybox(SkyBoxObject* object, mat4 worldToViewMatrix, mat4* projectionM
 	glUniformMatrix4fv(glGetUniformLocation(*shader, "totMatrix"), 1, GL_TRUE, totMatrix.m);
   glUniform1i(glGetUniformLocation(*shader, "texUnit"), GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, object->texture_id);
-	DrawModel(object->model_ptr, *shader, "inPosition", "inNormal", "inTexCoord");
+	DrawModel(object->model_ptr, *shader, "inPosition", NULL, "inTexCoord");
 }
 
 void render_skybox(SkyBoxObject** skybox, mat4 worldToViewMatrix, mat4* projectionMatrix, GLuint* shader)

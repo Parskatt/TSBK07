@@ -43,9 +43,9 @@ struct ObjectList{
 };
 
 WorldObject* new_object(GLuint tex_id, Model* model, mat4 value);
-WorldObject* new_skybox(char* texture, char* model, mat4 pos);
+//WorldObject* new_skybox(char* texture, char* model, mat4 pos);
 void render_object(WorldObject* object, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader);
-void render_skybox(WorldObject* object, mat4 worldToViewMatrix, mat4* projectionMatrix, GLuint* shader);
+//void render_skybox(WorldObject* object, mat4 worldToViewMatrix, mat4* projectionMatrix, GLuint* shader);
 ObjectList* create_objects(TextureList* textures, ModelList* models);
 void render_objects(ObjectList* objects, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader);
 ModelList* load_models();
