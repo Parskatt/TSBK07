@@ -23,7 +23,7 @@ GLuint basic_shading, skybox_shading, advanced_shading;
 //Make objects instead
 //WorldObject *octagon, *skybox, *ground, *bunny;
 TerrainObject *terrain_l,*terrain_h,*terrain_above;
-SkyBoxObject *skybox[6];
+SkyBoxObject *skybox[6], *test_skybox;
 ObjectList *created_objects;
 ModelList *models;
 TextureList *textures;
@@ -49,6 +49,7 @@ void init(void)
 	terrain_l = new_terrain("Textures/kt_rock_1f_dk.tga", T(0,0,0), 100);
 	terrain_h = new_terrain("Textures/kt_rock_1f_dk.tga", T(0,0,0), -100);
 	models = load_models();
+	test_skybox = skybox[0];
 	//Textures init
 	textures = load_textures();
 	//Create objects
