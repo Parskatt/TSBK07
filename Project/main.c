@@ -44,7 +44,8 @@ void init(void)
 	//Lights init
 	lights = lighting_hell();
 	//Skybox init
-	make_skybox_object(skybox, "Textures/dirt.tga", "Textures/skybox/sunset2.tga", "Textures/skybox/sunset3.tga", "Textures/skybox/sunset4.tga", "Textures/skybox/sunset5.tga", "Textures/skybox/sunset6.tga");
+	//left, right, up, down, front, back
+	//make_skybox_object(skybox, "Textures/skybox/sunset1.tga", "Textures/skybox/sunset2.tga", "Textures/skybox/sunset5.tga", "Textures/skybox/sunset4.tga", "Textures/skybox/sunset3.tga", "Textures/skybox/sunset6.tga");
 	//Terrain and other models init
 	terrain_l = new_terrain("Textures/kt_rock_1f_dk.tga", T(0,0,0), 100);
 	terrain_h = new_terrain("Textures/kt_rock_1f_dk.tga", T(0,0,0), -100);
@@ -66,7 +67,7 @@ void display(void)
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//Draw the skybox
-	render_skybox(skybox, worldToViewMatrix, &projectionMatrix, &skybox_shading);
+	//render_skybox(skybox, worldToViewMatrix, &projectionMatrix, &skybox_shading);
 	//Draw everything else, begin with applying lighting to shaders
 	apply_lighting(lights, &advanced_shading, cam_pos);
 	render_terrain(terrain_l, &worldToViewMatrix, &projectionMatrix, &advanced_shading);

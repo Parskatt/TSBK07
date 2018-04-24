@@ -131,13 +131,15 @@ void make_skybox_object(SkyBoxObject** skybox, char* texture1, char* texture2, c
 
 void draw_skybox(SkyBoxObject* object, mat4 worldToViewMatrix, mat4* projectionMatrix, GLuint* shader)
 {
-	mat4 totMatrix;
+  mat4 totMatrix;
   glUseProgram(*shader);
   worldToViewMatrix.m[3] = 0;
 	worldToViewMatrix.m[7] = 0;
 	worldToViewMatrix.m[11] = 0;
-	totMatrix = Mult(*projectionMatrix,Mult(worldToViewMatrix,object->position));
-	glUniformMatrix4fv(glGetUniformLocation(*shader, "totMatrix"), 1, GL_TRUE, totMatrix.m);
+  glUniformMatrix4fv(glGetUniformLocation(*shader, "modelToWorldMatrix"), 1, GL_TRUE, object->position.m);
+  glUniformMatrix4fv(glGetUniformLocation(*shader, "worldToViewMatrix"), 1, GL_TRUE, worldToViewMatrix.m);
+  glUniformMatrix4fv(glGetUniformLocation(*shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix->m);
+
   glUniform1i(glGetUniformLocation(*shader, "texUnit"), GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, object->texture_id);
 	DrawModel(object->model_ptr, *shader, "inPosition", NULL, "inTexCoord");
