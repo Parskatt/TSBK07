@@ -60,8 +60,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 SurfPos, vec3 viewDir)
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 1.0);//shininess
     // attenuation
     float distance    = length(light.position - SurfPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance +
-  			     light.quadratic * (distance * distance));
+    float attenuation = 1.0 / (light.constant + light.linear * distance +light.quadratic * (distance * distance));
     // combine results
     vec3 ambient  = light.ambient  * vec3(texture(texUnit, TexCoord));
     vec3 diffuse  = light.diffuse  * diff * vec3(texture(texUnit, TexCoord));
@@ -77,7 +76,7 @@ void main()
     // properties
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - SurfPos);
-    float dist = 1/(0.2*length(viewPos - SurfPos)+1);
+    float dist = 1/(0.1*length(viewPos - SurfPos)+1);
     vec3 result = vec3(0,0,0);
     // phase 1: Directional lighting
     result = CalcDirLight(dirLight, norm, viewDir);

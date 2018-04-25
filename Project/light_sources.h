@@ -34,13 +34,13 @@ struct DirLight {
     vec3 specular;
 };
 struct LightSources{
-
-	PointLight pointlights[4];
+	GLuint num_of_ptlights;
 	DirLight dirlight;
-  //GLuint id;
+	PointLight pointlights[];
 };
 PointLight* make_point_light(vec3 position,float constant,float linear,float quadratic,vec3 ambient,vec3 diffuse,vec3 specular);
 DirLight* make_dir_light(vec3 direction,vec3 ambient,vec3 diffuse,vec3 specular);
+LightSources* append_ptlight(LightSources* lights, PointLight* ptlight);
 LightSources* lighting_heaven();
 LightSources* lighting_hell();
 void apply_lighting(LightSources* lights, GLuint* shader, vec3 cam_pos);

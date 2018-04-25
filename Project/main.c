@@ -12,7 +12,6 @@
 #include "skybox.h"
 #include "terrain.h"
 #include "light_sources.h"
-
 //"Globals"
 mat4 projectionMatrix, worldToViewMatrix, modelToWorldMatrix, totMatrix;
 vec3 cam_pos,cam_dir,cam_speed;
@@ -28,7 +27,7 @@ ObjectList *created_objects;
 ModelList *models;
 TextureList *textures;
 LightSources *lights;
-
+GLuint torch_flag = 0;
 void init(void)
 {
 	// GL inits
@@ -45,7 +44,7 @@ void init(void)
 	lights = lighting_hell();
 	//Skybox init
 	//left, right, up, down, front, back
-	//make_skybox_object(skybox, "Textures/skybox/sunset1.tga", "Textures/skybox/sunset2.tga", "Textures/skybox/sunset5.tga", "Textures/skybox/sunset4.tga", "Textures/skybox/sunset3.tga", "Textures/skybox/sunset6.tga");
+	make_skybox_object(skybox, "Textures/skybox/miramar_lf.tga","Textures/skybox/miramar_rt.tga","Textures/skybox/miramar_up.tga","Textures/skybox/miramar_dn.tga","Textures/skybox/miramar_ft.tga","Textures/skybox/miramar_bk.tga");//"Textures/skybox/sunset1.tga", "Textures/skybox/sunset3.tga", "Textures/skybox/sunset5.tga", "Textures/skybox/sunset4.tga", "Textures/skybox/sunset3.tga", "Textures/skybox/sunset6.tga");
 	//Terrain and other models init
 	terrain_l = new_terrain("Textures/kt_rock_1f_dk.tga", T(0,0,0), 100);
 	terrain_h = new_terrain("Textures/kt_rock_1f_dk.tga", T(0,0,0), -100);
@@ -54,6 +53,7 @@ void init(void)
 	textures = load_textures();
 	//Create objects
 	created_objects = create_objects(textures,models);
+	printf("hej\n");
 	glutPostRedisplay();
 }
 
@@ -64,10 +64,16 @@ void timer(int i)
 
 void display(void)
 {
+	//Check if a torch should be added
+	if(torch_flag){
+		append_ptlight(lights,make_point_light(cam_pos,1.0,0.5,0.5,SetVector(1,1,1),SetVector(1,1,1),SetVector(1,1,1)));
+		torch_flag = 0;
+		//append_torch(&torches);
+	}
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//Draw the skybox
-	//render_skybox(skybox, worldToViewMatrix, &projectionMatrix, &skybox_shading);
+	render_skybox(skybox, worldToViewMatrix, &projectionMatrix, &skybox_shading);
 	//Draw everything else, begin with applying lighting to shaders
 	apply_lighting(lights, &advanced_shading, cam_pos);
 	render_terrain(terrain_l, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
@@ -91,7 +97,7 @@ void mouseDraggedfunc(int x, int y)
 
 void keyboardfunc(unsigned char c, int x, int y)
 {
-  keyboard(c, x, y, &worldToViewMatrix, &cam_pos, &cam_dir);
+  keyboard(c, x, y, &worldToViewMatrix, &cam_pos, &cam_dir, &torch_flag);
 }
 
 int main(int argc, char **argv)

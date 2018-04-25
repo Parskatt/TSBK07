@@ -131,7 +131,6 @@ void make_skybox_object(SkyBoxObject** skybox, char* texture1, char* texture2, c
 
 void draw_skybox(SkyBoxObject* object, mat4 worldToViewMatrix, mat4* projectionMatrix, GLuint* shader)
 {
-  mat4 totMatrix;
   glUseProgram(*shader);
   worldToViewMatrix.m[3] = 0;
 	worldToViewMatrix.m[7] = 0;
@@ -148,11 +147,11 @@ void draw_skybox(SkyBoxObject* object, mat4 worldToViewMatrix, mat4* projectionM
 void render_skybox(SkyBoxObject** skybox, mat4 worldToViewMatrix, mat4* projectionMatrix, GLuint* shader)
 {
 	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
+	//glDisable(GL_CULL_FACE);
 	for (int i = 0; i<6; i++)
 	{
 		draw_skybox(skybox[i], worldToViewMatrix, projectionMatrix, shader);
 	}
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 }

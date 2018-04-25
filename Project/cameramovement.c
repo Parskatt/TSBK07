@@ -8,7 +8,7 @@ void camera_init(vec3 *cam_pos,vec3 *cam_dir,mat4 *projectionMatrix,mat4 *worldT
 	*projectionMatrix = frustum(-0.16, 0.16, -0.09, 0.09, 0.2, 1000.0);
 }
 
-void keyboard(unsigned char c, int x, int y, mat4* worldToViewMatrix, vec3* cam_pos, vec3* cam_dir)
+void keyboard(unsigned char c, int x, int y, mat4* worldToViewMatrix, vec3* cam_pos, vec3* cam_dir, GLuint* torch_flag)
 {
 	static float a = 0.5;
 	vec3 direction = SetVector(0,0,0);
@@ -31,6 +31,9 @@ void keyboard(unsigned char c, int x, int y, mat4* worldToViewMatrix, vec3* cam_
 		break;
 	case 'f': //For fullscreen
 		glutToggleFullScreen();
+		break;
+	case 'l':
+		*torch_flag = 1;
 		break;
 	default:
 		direction = SetVector(0,0,0);
