@@ -38,7 +38,7 @@ struct WorldObject{
 };
 
 struct ObjectList{
-	int hej;
+	int size;
 	WorldObject* obj_list[];
 };
 
@@ -46,7 +46,9 @@ WorldObject* new_object(GLuint tex_id, Model* model, mat4 value);
 WorldObject* new_skybox(char* texture, char* model, mat4 pos);
 void render_object(WorldObject* object, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader);
 void render_skybox(WorldObject* object, mat4 worldToViewMatrix, mat4* projectionMatrix, GLuint* shader);
-ObjectList* create_objects(TextureList* textures, ModelList* models);
+ObjectList* create_static_objects(TextureList* textures, ModelList* models);
+ObjectList* create_torch_objects();
+void add_torch(ObjectList* objects, TextureList* textures, ModelList* models, vec3 cam_pos);
 void render_objects(ObjectList* objects, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader);
 ModelList* load_models();
 TextureList* load_textures();
