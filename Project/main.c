@@ -66,9 +66,8 @@ void display(void)
 {
 	//Check if a torch should be added
 	if(torch_flag){
-		append_ptlight(lights,make_point_light(cam_pos,1.0,0.5,0.5,SetVector(1,1,1),SetVector(1,1,1),SetVector(1,1,1)));
+		append_ptlight(lights,make_point_light(cam_pos,0.3,0.5,0.8,SetVector(1,0.5,0),SetVector(1,0.5,0),SetVector(1,0.5,0)));
 		torch_flag = 0;
-		//append_torch(&torches);
 	}
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

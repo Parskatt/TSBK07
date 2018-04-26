@@ -19,7 +19,7 @@ struct PointLight {
     vec3 diffuse;
     vec3 specular;
 };
-#define NR_POINT_LIGHTS 4
+#define NR_POINT_LIGHTS 12
 
 //In
 in vec2 TexCoord;
@@ -54,21 +54,15 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 SurfPos, vec3 viewDir)
 {
     vec3 lightDir = normalize(light.position - SurfPos);
     // diffuse shading
-    float diff = max(dot(lightDir, SurfPos), 0.0);
+    float diff = max(dot(lightDir, normal), 0.0);
     // specular shading
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 1.0);//shininess
     // attenuation
     float distance    = length(light.position - SurfPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance +light.quadratic * (distance * distance));
+    float attenuation = 10.0 / (light.constant + light.linear * distance +light.quadratic * (distance * distance));
     // combine results
-    vec3 ambient  = light.ambient  * vec3(texture(texUnit, TexCoord));
-    vec3 diffuse  = light.diffuse  * diff * vec3(texture(texUnit, TexCoord));
-    vec3 specular = light.specular * spec * vec3(texture(texUnit, TexCoord));
-    ambient  *= attenuation;
-    diffuse  *= attenuation;
-    specular *= attenuation;
-    return (ambient + diffuse + specular);
+    return attenuation*(light.ambient + light.diffuse*diff + light.specular*spec)*vec3(texture(texUnit, TexCoord));
 }
 
 void main()
@@ -76,15 +70,13 @@ void main()
     // properties
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - SurfPos);
-    float dist = 1/(0.1*length(viewPos - SurfPos)+1);
+    float viewdist = 1/(0.2*length(viewPos - SurfPos)+1);
     vec3 result = vec3(0,0,0);
     // phase 1: Directional lighting
     result = CalcDirLight(dirLight, norm, viewDir);
     // phase 2: Point lights
     for(int i = 0; i < NR_POINT_LIGHTS; i++)
         result += CalcPointLight(pointLights[i], norm, SurfPos, viewDir);
-    // phase 3: Spot light
-    //result += CalcSpotLight(spotLight, norm, SurfPos, viewDir);
 
-    out_Color = vec4(dist*result, 1.0);
+    out_Color = vec4(viewdist*result, 1.0);
 }
