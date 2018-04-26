@@ -28,7 +28,7 @@
 #define Point3D vec3
 #define Matrix3D mat3
 #define Matrix4D mat4
-	
+
 	// vec3 is very useful
 	typedef struct vec3
 	{
@@ -40,7 +40,7 @@
 //			vec3(vec4 v) : x(v.x), y(v.y), z(v.z) {}
 		#endif
 	} vec3, *vec3Ptr;
-	
+
 	// vec4 is not as useful. Can be a color with alpha, or a quaternion, but IMHO you
 	// rarely need homogenous coordinate vectors on the CPU.
 	typedef struct vec4
@@ -49,11 +49,11 @@
 		#ifdef __cplusplus
             vec4() {}
 			vec4(GLfloat x2, GLfloat y2, GLfloat z2, GLfloat w2) : x(x2), y(y2), z(z2), w(w2) {}
-			
+
 			vec4(vec3 v) : x(v.x), y(v.y), z(v.z), w(1) {}
 		#endif
 	} vec4, *vec4Ptr;
-	
+
 	typedef struct mat4
 	{
 		GLfloat m[16];
@@ -79,6 +79,7 @@ extern "C" {
 	vec3 Normalize(vec3 a);
 	vec3 CalcNormalVector(vec3 a, vec3 b, vec3 c);
 	void SplitVector(vec3 v, vec3 n, vec3 *vn, vec3 *vp);
+	float distance(vec3 a, vec3 b);
 
 // Matrix operations primarily on 4x4 matrixes!
 // Row-wise by default but can be configured to column-wise (see SetTransposed)
@@ -115,7 +116,7 @@ extern "C" {
 
 // GLU replacement functions
 	mat4 lookAtv(vec3 p, vec3 l, vec3 v);
-	mat4 lookAt(GLfloat px, GLfloat py, GLfloat pz, 
+	mat4 lookAt(GLfloat px, GLfloat py, GLfloat pz,
 			GLfloat lx, GLfloat ly, GLfloat lz,
 			GLfloat vx, GLfloat vy, GLfloat vz);
 	mat4 perspective(float fovyInDegrees, float aspectRatio,
@@ -139,7 +140,6 @@ extern "C" {
 // Convenient printing calls
 	void printMat4(mat4 m);
 	void printVec3(vec3 in);
-
 #ifdef __cplusplus
 }
 #endif
@@ -310,7 +310,6 @@ vec3 operator*(const mat3 &a, const vec3 &b)
 {
 	return MultMat3Vec3(a, b); // result = a * b
 }
-
 #endif
 
 
