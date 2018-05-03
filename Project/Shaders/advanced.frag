@@ -67,7 +67,7 @@ void main()
     // properties
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - SurfPos);
-    float viewdist = 1/(0.1*length(viewPos-SurfPos)+1);
+    float viewdist = 1/(0.2*length(viewPos-SurfPos)+1);
     vec3 result = vec3(0,0,0);
     // phase 1: Directional lighting
     result = CalcDirLight(dirLight, norm, viewDir);
