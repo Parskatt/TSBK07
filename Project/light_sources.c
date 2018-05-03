@@ -74,9 +74,8 @@ LightSources* find_closest_lights(LightSources* lights, LightSources* nearest, i
 }
 void apply_lighting(LightSources* lights, GLuint* shader, vec3 cam_pos){
   //Positional lights
-  glUniform3fv(glGetUniformLocation(*shader, "viewPos"),1,&cam_pos.x);
   glUseProgram(*shader);
-  printf("%d\n",lights->num_of_ptlights);
+  glUniform3fv(glGetUniformLocation(*shader, "viewPos"),1,&cam_pos.x);
   LightSources* closest_lights = malloc(sizeof(LightSources)+12*sizeof(PointLight));;
   closest_lights->num_of_ptlights = 12;//Here we have specified 4 lights, could do more if we want to, however we would have to change the shader
   find_closest_lights(lights,closest_lights,closest_lights->num_of_ptlights,cam_pos);

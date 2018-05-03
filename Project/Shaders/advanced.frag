@@ -44,10 +44,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 100.0);//Shininess
     // combine results
-    vec3 ambient  = light.ambient  * vec3(texture(texUnit, TexCoord));
-    vec3 diffuse  = light.diffuse  * diff *vec3(texture(texUnit, TexCoord));
-    vec3 specular = light.specular * spec *vec3(texture(texUnit, TexCoord));
-    return (ambient + diffuse + specular);
+    return (light.ambient + light.diffuse*diff + light.specular*spec)*vec3(texture(texUnit, TexCoord));;
 }
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 SurfPos, vec3 viewDir)
@@ -70,7 +67,7 @@ void main()
     // properties
     vec3 norm = normalize(Normal);
     vec3 viewDir = normalize(viewPos - SurfPos);
-    float viewdist = 1/(0.2*length(viewPos - SurfPos)+1);
+    float viewdist = 1/(0.1*length(viewPos-SurfPos)+1);
     vec3 result = vec3(0,0,0);
     // phase 1: Directional lighting
     result = CalcDirLight(dirLight, norm, viewDir);

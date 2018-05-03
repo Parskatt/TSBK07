@@ -70,6 +70,7 @@ void display(void)
 		add_torch(torches,textures,models, cam_pos);
 		torch_flag = 0;
 	}
+	//printf("Got into display\n");
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//Draw the skybox
