@@ -7,9 +7,10 @@
 #include "loadobj.h"
 #include "LoadTGA.h"
 
-void load_shaders(GLuint *program1, GLuint *program2, GLuint *program3)
+void load_shaders(GLuint *program1, GLuint *program2, GLuint *program3, GLuint *program4)
 {
   *program1 = loadShaders("Shaders/basic.vert", "Shaders/basic.frag");
   *program2 = loadShaders("Shaders/skybox.vert", "Shaders/skybox.frag");
   *program3 = loadShaders("Shaders/advanced.vert", "Shaders/advanced.frag");
+	*program4 = loadShaders("Shaders/particles.vert", "Shaders/particles.frag");
 }

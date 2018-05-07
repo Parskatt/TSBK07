@@ -7,14 +7,6 @@ WorldObject* new_object(GLuint tex_id, Model* model, mat4 pos) {
   p->position = pos;
   return p;
 }
-
-/*WorldObject* new_skybox(char* texture, char* model, mat4 pos) {
-  WorldObject* p = malloc(sizeof(WorldObject));
-  LoadTGATextureSimple(texture, &p->texture_id);
-  p->model_ptr = LoadModelPlus(model);
-  p->position = pos;
-  return p;
-}*/
 void render_object(WorldObject* object, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader){
   //Hopefully this will make rendercalls much less space wasting in the main loop :^)
   glUseProgram(*shader); //program used when drawing octagon
@@ -23,29 +15,70 @@ void render_object(WorldObject* object, mat4* worldToViewMatrix, mat4* projectio
 	glUniformMatrix4fv(glGetUniformLocation(*shader, "worldToViewMatrix"), 1, GL_TRUE, worldToViewMatrix->m);
   glUniformMatrix4fv(glGetUniformLocation(*shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix->m);
   //Send textures to shader
-  glUniform1i(glGetUniformLocation(*shader, "texUnit"), GL_TEXTURE0);//Right now texture 0 is hardcoded, change later
-  glBindTexture(GL_TEXTURE_2D, object->texture_id);//Maybe dont bind every time? (Karin pls fix)
+  glUniform1i(glGetUniformLocation(*shader, "texUnit"), GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, object->texture_id);
   //Draw the model
 	DrawModel(object->model_ptr, *shader, "inPosition", "inNormal", "inTexCoord");
 }
 
-/*void render_skybox(WorldObject* object, mat4 worldToViewMatrix, mat4* projectionMatrix, GLuint* shader){
+GLfloat vertices_p[] = {
+ -0.1f, -0.1f, 0.0f,
+ 0.1f, -0.1f, 0.0f,
+ -0.1f, 0.1f, 0.0f
+};
+
+ GLubyte minitex[4][4][3] =
+ {
+	 { {10, -20, 0}, { 45, 6,1}, { 8, 5,5}, { 2,9,6}},
+	 { { -145, 34,78}, {-98, 248,243}, { 11,32,-9}, { -77, 87,-90}},
+	 { { -80, 65,44}, { 50,255,67}, {-76,-50,0}, { 50, -50,5}},
+	 { { 50,-255,33}, { -214, 9,0}, { -158, -66,52}, {-55, 50,44}},
+ };
+
+void render_particles(mat4* pos, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader, unsigned int *vertexArrayObjID, int num_particles, int width, int height, GLfloat t){
   //Hopefully this will make rendercalls much less space wasting in the main loop :^)
-  mat4 totMatrix;
-  glUseProgram(*shader); //program used when drawing octagon
+  glUseProgram(*shader);
+  //Send matrices to shader
+  glUniformMatrix4fv(glGetUniformLocation(*shader, "modelToWorldMatrix"), 1, GL_TRUE, pos->m);
+  glUniformMatrix4fv(glGetUniformLocation(*shader, "worldToViewMatrix"), 1, GL_TRUE, worldToViewMatrix->m);
+  glUniformMatrix4fv(glGetUniformLocation(*shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix->m);
+  glUniform1i(glGetUniformLocation(*shader, "tex"), 0); // Texture unit 0
+  glUniform1f(glGetUniformLocation(*shader, "time"), t);
+  glBindVertexArray(*vertexArrayObjID);	// Select VAO
+  glDisable(GL_DEPTH_TEST);
+  glDisable(GL_CULL_FACE);
+  glDrawArraysInstanced(GL_POINTS, 0, 4, num_particles);
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_CULL_FACE);
+}
 
-  worldToViewMatrix.m[3] = 0;
-  worldToViewMatrix.m[7] = 0;
-  worldToViewMatrix.m[11] = 0;
+void init_particles(GLuint* shader, unsigned int *vertexArrayObjID, int num_particles, int width, int height) {
 
-	totMatrix = Mult(*projectionMatrix,Mult(worldToViewMatrix,object->position));
-	glUniformMatrix4fv(glGetUniformLocation(*shader, "totMatrix"), 1, GL_TRUE, totMatrix.m);
-  glUniform1i(glGetUniformLocation(*shader, "texUnit"), GL_TEXTURE0);//Right now texture 0 is hardcoded, change later
-  glBindTexture(GL_TEXTURE_2D, object->texture_id);//Maybe dont bind every time? (Karin pls fix)
-	DrawModel(object->model_ptr, *shader, "inPosition", "inNormal", "inTexCoord");
-}*/
+  unsigned int vertexBufferObjID;
+  GLuint minitexid;
+  glUseProgram(*shader);
+  glGenVertexArrays(1, &(*vertexArrayObjID));
+  glBindVertexArray(*vertexArrayObjID);
+  glGenBuffers(1, &vertexBufferObjID);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObjID);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_p), vertices_p, GL_STATIC_DRAW);
+  glVertexAttribPointer(glGetAttribLocation(*shader, "in_Position"), 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glEnableVertexAttribArray(glGetAttribLocation(*shader, "in_Position"));
+  //upload to shader
+  glUniform1i(glGetUniformLocation(*shader, "tex"), 0);
+  glUniform1f(glGetUniformLocation(*shader, "num_particles"), num_particles);
+  glUniform1f(glGetUniformLocation(*shader, "width"), width);
+  glUniform1f(glGetUniformLocation(*shader, "height"), height);
 
-
+  //minitex init
+  glGenTextures(1, &minitexid);
+  glBindTexture(GL_TEXTURE_2D, minitexid);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4, 4, 0, GL_RGB, GL_UNSIGNED_BYTE, minitex);
+}
 
 ObjectList* create_objects(TextureList* textures, ModelList* models)
 {
