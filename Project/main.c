@@ -12,12 +12,14 @@
 #include "skybox.h"
 #include "terrain.h"
 #include "light_sources.h"
+
 //"Globals"
 mat4 projectionMatrix, worldToViewMatrix, modelToWorldMatrix, totMatrix;
 vec3 cam_pos,cam_dir,cam_speed;
 GLint prevx,prevy;
+
 //Initialize Shading stuff
-GLuint basic_shading, skybox_shading, advanced_shading, splat_shading, torch_flag=0;
+GLuint basic_shading, skybox_shading, advanced_shading, splat_shading, particle_shading, torch_flag=0;
 //Initialize Model stuff
 //Make objects instead
 TerrainObject *terrain_l,*terrain_h;
@@ -28,6 +30,10 @@ ModelList *models;
 TextureList *textures;
 LightSources *lights;
 
+unsigned int particleVAO;
+int height = 10, num_particles = 700, width = 4;
+GLfloat t = 0;
+
 void init(void)
 {
 	// GL inits
@@ -37,7 +43,7 @@ void init(void)
 	printError("GL inits");
 
 	//Load Shaders
-	load_shaders(&basic_shading,&skybox_shading, &advanced_shading, &splat_shading);	// Load and compile shader
+	load_shaders(&basic_shading,&skybox_shading, &advanced_shading, &splat_shading, &particle_shading);	// Load and compile shader
 	//Camera init
 	camera_init(&cam_pos,&cam_dir,&projectionMatrix,&worldToViewMatrix);
 	//Lights init
@@ -54,11 +60,10 @@ void init(void)
 	textures = load_textures();
 	terrain_above = new_splat("Textures/lava.tga","Textures/grass.tga","Textures/conc.tga", "Textures/above_terrain.tga", "Textures/map.tga", T(0,50,0), 10);
 
-
-
 	//Create objects
 	created_static_objects = create_static_objects(textures,models);
 	torches = create_torch_objects();
+	init_particles(&particle_shading, &particleVAO, num_particles, width, height);
 	glutPostRedisplay();
 }
 
@@ -81,12 +86,19 @@ void display(void)
 	render_skybox(skybox, worldToViewMatrix, &projectionMatrix, &skybox_shading);
 	//Draw everything else, begin with applying lighting to shaders
 	apply_lighting(lights, &advanced_shading, cam_pos);
+
 	apply_lighting(lights, &splat_shading, cam_pos);
+	apply_lighting(lights, &particle_shading, cam_pos);
 	render_terrain(terrain_l, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	render_terrain(terrain_h, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	render_splat(terrain_above, &worldToViewMatrix, &projectionMatrix, &splat_shading);
 	render_objects(created_static_objects, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	render_objects(torches, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
+
+	mat4 pos;
+	pos = T(125,80,125);
+	t += 0.02;
+	render_particles(&pos, &worldToViewMatrix, &projectionMatrix, &particle_shading, &particleVAO, num_particles, width, height, t);
 
 	//Swap buffers to get new stuff out, redisplay to init next update.
 	glutSwapBuffers();

@@ -8,7 +8,6 @@ WorldObject* new_object(GLuint tex_id, Model* model, mat4 pos) {
   return p;
 }
 
-
 void render_object(WorldObject* object, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader){
   //Hopefully this will make rendercalls much less space wasting in the main loop :^)
   glUseProgram(*shader); //program used when drawing octagon
@@ -17,11 +16,73 @@ void render_object(WorldObject* object, mat4* worldToViewMatrix, mat4* projectio
 	glUniformMatrix4fv(glGetUniformLocation(*shader, "worldToViewMatrix"), 1, GL_TRUE, worldToViewMatrix->m);
   glUniformMatrix4fv(glGetUniformLocation(*shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix->m);
   //Send textures to shader
-  glUniform1i(glGetUniformLocation(*shader, "texUnit"), GL_TEXTURE0);//Right now texture 0 is hardcoded, change later
-  glBindTexture(GL_TEXTURE_2D, object->texture_id);//Maybe dont bind every time? (Karin pls fix)
+  glUniform1i(glGetUniformLocation(*shader, "texUnit"), GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, object->texture_id);
   //Draw the model
 	DrawModel(object->model_ptr, *shader, "inPosition", "inNormal", "inTexCoord");
 }
+
+GLfloat vertices_p[] = {
+ -0.1f, -0.1f, 0.0f,
+ 0.1f, -0.1f, 0.0f,
+ -0.1f, 0.1f, 0.0f
+};
+
+ GLubyte minitex[4][4][3] =
+ {
+	 { {10, -20, 0}, { 45, 6,1}, { 8, 5,5}, { 2,9,6}},
+	 { { -145, 34,78}, {-98, 248,243}, { 11,32,-9}, { -77, 87,-90}},
+	 { { -80, 65,44}, { 50,255,67}, {-76,-50,0}, { 50, -50,5}},
+	 { { 50,-255,33}, { -214, 9,0}, { -158, -66,52}, {-55, 50,44}},
+ };
+
+void render_particles(mat4* pos, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader, unsigned int *vertexArrayObjID, int num_particles, int width, int height, GLfloat t){
+  //Hopefully this will make rendercalls much less space wasting in the main loop :^)
+  glUseProgram(*shader);
+  //Send matrices to shader
+  glUniformMatrix4fv(glGetUniformLocation(*shader, "modelToWorldMatrix"), 1, GL_TRUE, pos->m);
+  glUniformMatrix4fv(glGetUniformLocation(*shader, "worldToViewMatrix"), 1, GL_TRUE, worldToViewMatrix->m);
+  glUniformMatrix4fv(glGetUniformLocation(*shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix->m);
+  glUniform1i(glGetUniformLocation(*shader, "tex"), 0); // Texture unit 0
+  glUniform1f(glGetUniformLocation(*shader, "time"), t);
+  glBindVertexArray(*vertexArrayObjID);	// Select VAO
+  //glDisable(GL_DEPTH_TEST);
+  //glDisable(GL_CULL_FACE);
+  glDrawArraysInstanced(GL_POINTS, 0, 4, num_particles);
+  //glEnable(GL_DEPTH_TEST);
+  //glEnable(GL_CULL_FACE);
+  glActiveTexture(GL_TEXTURE0);
+}
+
+void init_particles(GLuint* shader, unsigned int *vertexArrayObjID, int num_particles, int width, int height) {
+
+  unsigned int vertexBufferObjID;
+  GLuint minitexid;
+  glUseProgram(*shader);
+  glGenVertexArrays(1, &(*vertexArrayObjID));
+  glBindVertexArray(*vertexArrayObjID);
+  glGenBuffers(1, &vertexBufferObjID);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObjID);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_p), vertices_p, GL_STATIC_DRAW);
+  glVertexAttribPointer(glGetAttribLocation(*shader, "in_Position"), 3, GL_FLOAT, GL_FALSE, 0, 0);
+  glEnableVertexAttribArray(glGetAttribLocation(*shader, "in_Position"));
+  //upload to shader
+  glUniform1i(glGetUniformLocation(*shader, "tex"), 0);
+  glUniform1f(glGetUniformLocation(*shader, "num_particles"), num_particles);
+  glUniform1f(glGetUniformLocation(*shader, "width"), width);
+  glUniform1f(glGetUniformLocation(*shader, "height"), height);
+
+  //minitex init
+  glGenTextures(1, &minitexid);
+  glBindTexture(GL_TEXTURE_2D, minitexid);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4, 4, 0, GL_RGB, GL_UNSIGNED_BYTE, minitex);
+  glActiveTexture(GL_TEXTURE0);
+}
+
 
 ObjectList* create_static_objects(TextureList* textures, ModelList* models)
 {
@@ -63,7 +124,7 @@ void render_objects(ObjectList* objects, mat4* worldToViewMatrix, mat4* projecti
 
 ModelList* load_models()
 {
-  ModelList* out_list = malloc(sizeof(ModelList));
+  ModelList* out_list = malloc(10*sizeof(ModelList));
   out_list->model_list[0] = LoadModelPlus("Models/bunnyplus.obj");
   out_list->model_list[1] = LoadModelPlus("Models/octagon.obj");
   out_list->model_list[2] = LoadModelPlus("Models/torch1.obj");
@@ -75,7 +136,7 @@ ModelList* load_models()
 
 ModelList* load_torch_models()
 {
-  ModelList* out_list = malloc(sizeof(ModelList));
+  ModelList* out_list = malloc(100*sizeof(ModelList));
   out_list->size = 0;
   return out_list;
 }
@@ -83,7 +144,7 @@ ModelList* load_torch_models()
 
 TextureList* load_textures()
 {
-  TextureList* out_list = malloc(sizeof(TextureList));
+  TextureList* out_list = malloc(10*sizeof(TextureList));
   LoadTGATextureSimple("Textures/maskros512.tga", &out_list->texture_list[0]);
   LoadTGATextureSimple("Textures/lava.tga", &out_list->texture_list[1]);
   LoadTGATextureSimple("Textures/kt_rock_1f_dk.tga", &out_list->texture_list[2]);
