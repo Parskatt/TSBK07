@@ -31,7 +31,7 @@ TextureList *textures;
 LightSources *lights;
 
 unsigned int particleVAO;
-int height = 10, num_particles = 30, width = 4;
+int height = 55, num_particles = 400, width = 5;
 GLfloat t = 0;
 
 void init(void)
@@ -96,8 +96,8 @@ void display(void)
 	render_objects(torches, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 
 	mat4 pos;
-	pos = T(125,80,125);
-	t += 0.02;
+	pos = T(125,50,125);
+	t += 0.1;
 	render_particles(&pos, &worldToViewMatrix, &projectionMatrix, &particle_shading, &particleVAO, num_particles, width, height, t);
 
 	//Swap buffers to get new stuff out, redisplay to init next update.

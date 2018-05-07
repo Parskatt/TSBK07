@@ -11,6 +11,7 @@ uniform float time;
 uniform float num_particles;
 uniform float width;
 uniform float height;
+uniform float speed;
 uniform sampler2D tex;
 
 float mod_help;
@@ -29,13 +30,13 @@ void main()
 	temp = gl_InstanceID / width;
 	v = floor(temp) / num_particles;
 
-	offset = texture(tex, vec2(u, v))*5;
+	offset = texture(tex, vec2(u, v))*12;
 
 	newpos[0] += offset.r;
-	newpos[1] += offset.g*5; // more in y
+	newpos[1] += offset.g*15; // more offset in y
 	newpos[2] += offset.b;
 
-	newpos[1] -= time;
+	newpos[1] -= speed*time;
 	newpos[1] = height - mod(abs(newpos[1]), height);
 
 
