@@ -63,7 +63,7 @@ void render_objects(ObjectList* objects, mat4* worldToViewMatrix, mat4* projecti
 
 ModelList* load_models()
 {
-  ModelList* out_list = malloc(sizeof(ModelList));
+  ModelList* out_list = malloc(10*sizeof(ModelList));
   out_list->model_list[0] = LoadModelPlus("Models/bunnyplus.obj");
   out_list->model_list[1] = LoadModelPlus("Models/octagon.obj");
   out_list->model_list[2] = LoadModelPlus("Models/torch1.obj");
@@ -75,7 +75,7 @@ ModelList* load_models()
 
 ModelList* load_torch_models()
 {
-  ModelList* out_list = malloc(sizeof(ModelList));
+  ModelList* out_list = malloc(100*sizeof(ModelList));
   out_list->size = 0;
   return out_list;
 }
@@ -83,7 +83,7 @@ ModelList* load_torch_models()
 
 TextureList* load_textures()
 {
-  TextureList* out_list = malloc(sizeof(TextureList));
+  TextureList* out_list = malloc(10*sizeof(TextureList));
   LoadTGATextureSimple("Textures/maskros512.tga", &out_list->texture_list[0]);
   LoadTGATextureSimple("Textures/lava.tga", &out_list->texture_list[1]);
   LoadTGATextureSimple("Textures/kt_rock_1f_dk.tga", &out_list->texture_list[2]);

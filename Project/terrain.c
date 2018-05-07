@@ -3,7 +3,7 @@
 TerrainObject* new_terrain(char* texture, char* map, mat4 pos, int height_scale)
 {
   TextureData ttex;
-  TerrainObject* out_terrain = malloc(sizeof(TerrainObject));
+  TerrainObject* out_terrain = malloc(10*sizeof(TerrainObject));
   LoadTGATextureData(map, &ttex);
   LoadTGATextureSimple(texture, &out_terrain->texture_id);
   out_terrain->model_ptr = GenerateTerrain(&ttex, height_scale);

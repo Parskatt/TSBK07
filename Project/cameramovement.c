@@ -37,7 +37,7 @@ void keyboard(unsigned char c, int x, int y, mat4* worldToViewMatrix, vec3* cam_
 		break;
 	default:
 		direction = SetVector(0,0,0);
-		a = 0.0;
+		//a = 0.0;
 		break;
 	}
 	vec3 rot = MultMat3Vec3(TransposeMat3(mat4tomat3(*worldToViewMatrix)),direction);

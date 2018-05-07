@@ -52,7 +52,7 @@ void init(void)
 	models = load_models();
 	//Textures init
 	textures = load_textures();
-	terrain_above = new_splat("Textures/lava.tga","Textures/grass.tga","Textures/conc.tga", "Textures/above_terrain.tga", "Textures/map.tga", T(0,50,0), 10);
+	terrain_above = new_splat("Textures/lava.tga","Textures/grass.tga","Textures/kt_rock_1d.tga", "Textures/above_terrain.tga", "Textures/map.tga", T(0,50,0), 10);
 
 
 
