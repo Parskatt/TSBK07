@@ -84,7 +84,7 @@ ModelList* load_torch_models()
 TextureList* load_textures()
 {
   TextureList* out_list = malloc(sizeof(TextureList));
-  LoadTGATextureSimple("Textures/bildt2.tga", &out_list->texture_list[0]);
+  LoadTGATextureSimple("Textures/maskros512.tga", &out_list->texture_list[0]);
   LoadTGATextureSimple("Textures/lava.tga", &out_list->texture_list[1]);
   LoadTGATextureSimple("Textures/kt_rock_1f_dk.tga", &out_list->texture_list[2]);
 

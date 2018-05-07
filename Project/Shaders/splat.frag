@@ -31,7 +31,7 @@ out vec4 out_Color;
 
 //Uniform
 uniform vec3 viewPos;
-uniform sampler2D texUnit;
+uniform sampler2D tex1,tex2,tex3,map;
 uniform DirLight dirLight;
 uniform PointLight pointLights[NR_POINT_LIGHTS];
 
@@ -75,6 +75,9 @@ void main()
     for(int i = 0; i < NR_POINT_LIGHTS; i++)
         result += CalcPointLight(pointLights[i], norm, SurfPos, viewDir);
 
-    out_Color = vec4(viewdist*result, 1.0)*texture(texUnit,TexCoord);
+		vec4 m = normalize(texture(map, TexCoord/255));
 
+    out_Color = vec4(result, 1.0)*(texture(tex1, TexCoord) * m.r +
+				texture(tex2, TexCoord) * m.g +
+				texture(tex3, TexCoord) * m.b);
 }

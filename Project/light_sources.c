@@ -69,8 +69,8 @@ LightSources* find_closest_lights(LightSources* lights, LightSources* nearest, i
      nearest->pointlights[n] = lights->pointlights[n];
    }
    nearest->num_of_ptlights = num_of_lights;
-   nearest->dirlight = *make_dir_light(SetVector(1.0,1.0,1.0),SetVector(0.25,0.25,0.25),SetVector(0.0,0.0,0.0),SetVector(0.0,0.0,0.0)); //White light
-   return nearest;
+   nearest->dirlight = *make_dir_light(SetVector(1.0,1.0,1.0),SetVector(1,1,1),SetVector(0.0,0.0,0.0),SetVector(0.0,0.0,0.0)); //White light
+   return nearest;                                                   //change here
 }
 void apply_lighting(LightSources* lights, GLuint* shader, vec3 cam_pos){
   //Positional lights

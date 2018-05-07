@@ -17,11 +17,11 @@ mat4 projectionMatrix, worldToViewMatrix, modelToWorldMatrix, totMatrix;
 vec3 cam_pos,cam_dir,cam_speed;
 GLint prevx,prevy;
 //Initialize Shading stuff
-GLuint basic_shading, skybox_shading, advanced_shading, torch_flag=0;
+GLuint basic_shading, skybox_shading, advanced_shading, splat_shading, torch_flag=0;
 //Initialize Model stuff
 //Make objects instead
-//WorldObject *octagon, *skybox, *ground, *bunny;
-TerrainObject *terrain_l,*terrain_h,*terrain_above;
+TerrainObject *terrain_l,*terrain_h;
+SplatTerrain *terrain_above;
 SkyBoxObject *skybox[6];
 ObjectList *created_static_objects,*torches;
 ModelList *models;
@@ -37,7 +37,7 @@ void init(void)
 	printError("GL inits");
 
 	//Load Shaders
-	load_shaders(&basic_shading,&skybox_shading, &advanced_shading);	// Load and compile shader
+	load_shaders(&basic_shading,&skybox_shading, &advanced_shading, &splat_shading);	// Load and compile shader
 	//Camera init
 	camera_init(&cam_pos,&cam_dir,&projectionMatrix,&worldToViewMatrix);
 	//Lights init
@@ -46,11 +46,16 @@ void init(void)
 	//left, right, up, down, front, back
 	make_skybox_object(skybox, "Textures/skybox/miramar_lf.tga","Textures/skybox/miramar_rt.tga","Textures/skybox/miramar_up.tga","Textures/skybox/miramar_dn.tga","Textures/skybox/miramar_ft.tga","Textures/skybox/miramar_bk.tga");//"Textures/skybox/sunset1.tga", "Textures/skybox/sunset3.tga", "Textures/skybox/sunset5.tga", "Textures/skybox/sunset4.tga", "Textures/skybox/sunset3.tga", "Textures/skybox/sunset6.tga");
 	//Terrain and other models init
-	terrain_l = new_terrain("Textures/kt_rock_1f_dk.tga", T(0,0,0), 100);
-	terrain_h = new_terrain("Textures/kt_rock_1f_dk.tga", T(0,0,0), -100);
+	terrain_l = new_terrain("Textures/kt_rock_1f_dk.tga", "Textures/preliminary_cave_design3.tga", T(0,0,0), 100);
+	terrain_h = new_terrain("Textures/kt_rock_1f_dk.tga", "Textures/preliminary_cave_design3.tga", T(0,0,0), -100);
+
 	models = load_models();
 	//Textures init
 	textures = load_textures();
+	terrain_above = new_splat("Textures/lava.tga","Textures/grass.tga","Textures/conc.tga", "Textures/above_terrain.tga", "Textures/map.tga", T(0,50,0), 10);
+
+
+
 	//Create objects
 	created_static_objects = create_static_objects(textures,models);
 	torches = create_torch_objects();
@@ -70,15 +75,16 @@ void display(void)
 		add_torch(torches,textures,models, cam_pos);
 		torch_flag = 0;
 	}
-	//printf("Got into display\n");
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//Draw the skybox
 	render_skybox(skybox, worldToViewMatrix, &projectionMatrix, &skybox_shading);
 	//Draw everything else, begin with applying lighting to shaders
 	apply_lighting(lights, &advanced_shading, cam_pos);
+	apply_lighting(lights, &splat_shading, cam_pos);
 	render_terrain(terrain_l, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	render_terrain(terrain_h, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
+	render_splat(terrain_above, &worldToViewMatrix, &projectionMatrix, &splat_shading);
 	render_objects(created_static_objects, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	render_objects(torches, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 

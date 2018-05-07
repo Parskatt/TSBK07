@@ -1,11 +1,25 @@
 #include "terrain.h"
 
-TerrainObject* new_terrain(char* texture, mat4 pos, int height_scale)
+TerrainObject* new_terrain(char* texture, char* map, mat4 pos, int height_scale)
 {
   TextureData ttex;
   TerrainObject* out_terrain = malloc(sizeof(TerrainObject));
-  LoadTGATextureData("Textures/cave_terrain.tga", &ttex);
+  LoadTGATextureData(map, &ttex);
   LoadTGATextureSimple(texture, &out_terrain->texture_id);
+  out_terrain->model_ptr = GenerateTerrain(&ttex, height_scale);
+  out_terrain->position = pos;
+  return out_terrain;
+}
+
+SplatTerrain* new_splat(char* tex1, char* tex2, char* tex3, char* heightmap, char* splatmap, mat4 pos, int height_scale)
+{
+  TextureData ttex;
+  SplatTerrain* out_terrain = malloc(10*sizeof(SplatTerrain));
+  LoadTGATextureData(heightmap, &ttex);
+  LoadTGATextureSimple(tex1, &out_terrain->texture_id[0]);
+  LoadTGATextureSimple(tex2, &out_terrain->texture_id[1]);
+  LoadTGATextureSimple(tex3, &out_terrain->texture_id[2]);
+  LoadTGATextureSimple(splatmap, &out_terrain->texture_id[3]);
   out_terrain->model_ptr = GenerateTerrain(&ttex, height_scale);
   out_terrain->position = pos;
   return out_terrain;
@@ -20,6 +34,32 @@ void render_terrain(TerrainObject* object, mat4* worldToViewMatrix, mat4* projec
   glUniform1i(glGetUniformLocation(*shader, "texUnit"), GL_TEXTURE0);//Right now texture 0 is hardcoded, change later
   glBindTexture(GL_TEXTURE_2D, object->texture_id);//Maybe dont bind every time? (Karin pls fix)
 	DrawModel(object->model_ptr, *shader, "inPosition", "inNormal", "inTexCoord");
+}
+
+void render_splat(SplatTerrain* object, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader)
+{
+  glUseProgram(*shader); //program used when drawing octagon
+  glUniformMatrix4fv(glGetUniformLocation(*shader, "modelToWorldMatrix"), 1, GL_TRUE, object->position.m);
+  glUniformMatrix4fv(glGetUniformLocation(*shader, "worldToViewMatrix"), 1, GL_TRUE, worldToViewMatrix->m);
+  glUniformMatrix4fv(glGetUniformLocation(*shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix->m);
+
+  glUniform1i(glGetUniformLocation(*shader, "tex1"), 0); // Texture unit 0
+	glUniform1i(glGetUniformLocation(*shader, "tex2"), 1); // Texture unit 1
+	glUniform1i(glGetUniformLocation(*shader, "tex3"), 2); // Texture unit 2
+	glUniform1i(glGetUniformLocation(*shader, "map"), 4); // Texture unit 4
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, object->texture_id[0]);
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, object->texture_id[1]);
+  glActiveTexture(GL_TEXTURE2);
+  glBindTexture(GL_TEXTURE_2D, object->texture_id[2]);
+  glActiveTexture(GL_TEXTURE4);
+  glBindTexture(GL_TEXTURE_2D, object->texture_id[3]);
+
+
+	DrawModel(object->model_ptr, *shader, "inPosition", "inNormal", "inTexCoord");
+  glActiveTexture(GL_TEXTURE0);
 }
 
 Model* GenerateTerrain(TextureData *tex, int height_scale)
