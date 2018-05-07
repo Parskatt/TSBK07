@@ -31,7 +31,7 @@ TextureList *textures;
 LightSources *lights;
 
 unsigned int particleVAO;
-int height = 10, num_particles = 700, width = 4;
+int height = 10, num_particles = 30, width = 4;
 GLfloat t = 0;
 
 void init(void)
@@ -58,7 +58,7 @@ void init(void)
 	models = load_models();
 	//Textures init
 	textures = load_textures();
-	terrain_above = new_splat("Textures/lava.tga","Textures/grass.tga","Textures/kt_rock_1d.tga", "Textures/above_terrain.tga", "Textures/map.tga", T(0,50,0), 10);
+	terrain_above = new_splat("Textures/lava.tga","Textures/grass.tga","Textures/conc.tga", "Textures/above_terrain.tga", "Textures/map.tga", T(0,50,0), 10);
 
 	//Create objects
 	created_static_objects = create_static_objects(textures,models);
