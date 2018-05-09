@@ -28,16 +28,18 @@ GLfloat vertices_p[] = {
  -0.1f, 0.1f, 0.0f
 };
 
- GLubyte minitex[4][4][3] =
+ GLubyte minitex[5][4][3] =
  {
-	 { {10, -20, 0}, { 45, 6,1}, { 8, 5,5}, { 2,9,6}},
-	 { { -145, 34,78}, {-98, 248,243}, { 11,32,-9}, { -77, 87,-90}},
-	 { { -80, 65,44}, { 50,255,67}, {-76,-50,0}, { 50, -50,5}},
-	 { { 50,-255,33}, { -214, 9,0}, { -158, -66,52}, {-55, 50,44}},
+	 { {100, 20, 49}, { 85, 6,29}, { 80, 5,53}, { 72,9,64}},
+	 { { 95, 34,78}, {98, 248,43}, { 101,32,78}, { 77, 87,90}},
+	 { { 80, 65,44}, { 59,255,67}, {76,50,70}, { 58, 50,54}},
+	 { { 78,255,33}, { 91, 9,60}, { 108, 66,52}, {105, 50,44}},
+   { { 49,205,37}, { 87, 29,68}, { 78, 69,42}, {105, 60,46}},
  };
 
+  GLuint minitexid;
+
 void render_particles(mat4* pos, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader, unsigned int *vertexArrayObjID, int num_particles, int width, int height, GLfloat t){
-  //Hopefully this will make rendercalls much less space wasting in the main loop :^)
   glUseProgram(*shader);
   //Send matrices to shader
   glUniformMatrix4fv(glGetUniformLocation(*shader, "modelToWorldMatrix"), 1, GL_TRUE, pos->m);
@@ -45,19 +47,17 @@ void render_particles(mat4* pos, mat4* worldToViewMatrix, mat4* projectionMatrix
   glUniformMatrix4fv(glGetUniformLocation(*shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix->m);
   glUniform1i(glGetUniformLocation(*shader, "tex"), 0); // Texture unit 0
   glUniform1f(glGetUniformLocation(*shader, "time"), t);
+  int speed = 1; //use if time to implement acceleration
+  glUniform1f(glGetUniformLocation(*shader, "speed"), speed);
   glBindVertexArray(*vertexArrayObjID);	// Select VAO
-  //glDisable(GL_DEPTH_TEST);
-  //glDisable(GL_CULL_FACE);
-  glDrawArraysInstanced(GL_POINTS, 0, 4, num_particles);
-  //glEnable(GL_DEPTH_TEST);
-  //glEnable(GL_CULL_FACE);
+  glBindTexture(GL_TEXTURE_2D, minitexid);
   glActiveTexture(GL_TEXTURE0);
+  glDrawArraysInstanced(GL_POINTS, 0, 4, num_particles);
 }
 
 void init_particles(GLuint* shader, unsigned int *vertexArrayObjID, int num_particles, int width, int height) {
 
   unsigned int vertexBufferObjID;
-  GLuint minitexid;
   glUseProgram(*shader);
   glGenVertexArrays(1, &(*vertexArrayObjID));
   glBindVertexArray(*vertexArrayObjID);
@@ -89,7 +89,7 @@ ObjectList* create_static_objects(TextureList* textures, ModelList* models)
   ObjectList* out_list = malloc(sizeof(ObjectList)+10*sizeof(WorldObject));
   out_list->obj_list[0] = new_object(textures->texture_list[0], models->model_list[0], T(0,10,10));
   out_list->obj_list[1] = new_object(textures->texture_list[0], models->model_list[1], T(0,0,10));
-  out_list->obj_list[2] = new_object(textures->texture_list[0], models->model_list[4], Mult(T(125,100,125),S(0.04, 0.04, 0.04)));
+  out_list->obj_list[2] = new_object(textures->texture_list[0], models->model_list[4], Mult(T(135,100,133),S(0.03, 0.03, 0.03)));
   out_list->size = 3;
   return out_list;
 }
