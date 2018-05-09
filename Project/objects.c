@@ -91,7 +91,7 @@ ObjectList* create_static_objects(TextureList* textures, ModelList* models)
   ObjectList* out_list = malloc(sizeof(ObjectList)+10*sizeof(WorldObject));
   out_list->obj_list[0] = new_object(textures->texture_list[0], models->model_list[0], T(0,10,10));
   out_list->obj_list[1] = new_object(textures->texture_list[0], models->model_list[1], T(0,0,10));
-  out_list->obj_list[2] = new_object(textures->texture_list[0], models->model_list[4], Mult(T(130,100,130),S(0.04, 0.04, 0.04)));
+  out_list->obj_list[2] = new_object(textures->texture_list[0], models->model_list[4], Mult(T(130,100,130),S(0.03, 0.03, 0.03)));
   out_list->size = 3;
   return out_list;
 }
