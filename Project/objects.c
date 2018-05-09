@@ -88,8 +88,9 @@ ObjectList* create_static_objects(TextureList* textures, ModelList* models)
 {
   ObjectList* out_list = malloc(sizeof(ObjectList)+10*sizeof(WorldObject));
   out_list->obj_list[0] = new_object(textures->texture_list[0], models->model_list[0], T(0,10,10));
-  out_list->obj_list[1] = new_object(textures->texture_list[0], models->mod el_list[1], T(0,0,10));
-  out_list->size = 2;
+  out_list->obj_list[1] = new_object(textures->texture_list[0], models->model_list[1], T(0,0,10));
+  out_list->obj_list[2] = new_object(textures->texture_list[0], models->model_list[4], Mult(T(125,100,125),S(0.04, 0.04, 0.04)));
+  out_list->size = 3;
   return out_list;
 }
 
@@ -117,7 +118,7 @@ void render_objects(ObjectList* objects, mat4* worldToViewMatrix, mat4* projecti
   //printf("Number of elements :%d", sizeof(objects->obj_list)/sizeof(objects->obj_list[0]));
   for (i=0; i<objects->size; i++)
   {
-    render_object(objects->obj_list[i], worldToViewMatrix, projectionMatrix, shader);
+      render_object(objects->obj_list[i], worldToViewMatrix, projectionMatrix, shader);
   }
 }
 
@@ -129,8 +130,10 @@ ModelList* load_models()
   out_list->model_list[1] = LoadModelPlus("Models/octagon.obj");
   out_list->model_list[2] = LoadModelPlus("Models/torch1.obj");
   out_list->model_list[3] = LoadModelPlus("Models/torch2.obj");
+  out_list->model_list[4] = LoadModelPlus("Models/cloud.obj");
 
-  out_list->size = 4;
+
+  out_list->size = 5;
   return out_list;
 }
 
