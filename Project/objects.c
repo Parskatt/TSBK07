@@ -37,6 +37,8 @@ GLfloat vertices_p[] = {
    { { 49,205,37}, { 87, 29,68}, { 78, 69,42}, {105, 60,46}},
  };
 
+  GLuint minitexid;
+
 void render_particles(mat4* pos, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader, unsigned int *vertexArrayObjID, int num_particles, int width, int height, GLfloat t){
   glUseProgram(*shader);
   //Send matrices to shader
@@ -45,21 +47,17 @@ void render_particles(mat4* pos, mat4* worldToViewMatrix, mat4* projectionMatrix
   glUniformMatrix4fv(glGetUniformLocation(*shader, "projectionMatrix"), 1, GL_TRUE, projectionMatrix->m);
   glUniform1i(glGetUniformLocation(*shader, "tex"), 0); // Texture unit 0
   glUniform1f(glGetUniformLocation(*shader, "time"), t);
-  int speed = 1;
+  int speed = 1; //use if time to implement acceleration
   glUniform1f(glGetUniformLocation(*shader, "speed"), speed);
   glBindVertexArray(*vertexArrayObjID);	// Select VAO
-  //glDisable(GL_DEPTH_TEST);
-  //glDisable(GL_CULL_FACE);
-  glDrawArraysInstanced(GL_POINTS, 0, 4, num_particles);
-  //glEnable(GL_DEPTH_TEST);
-  //glEnable(GL_CULL_FACE);
+  glBindTexture(GL_TEXTURE_2D, minitexid);
   glActiveTexture(GL_TEXTURE0);
+  glDrawArraysInstanced(GL_POINTS, 0, 4, num_particles);
 }
 
 void init_particles(GLuint* shader, unsigned int *vertexArrayObjID, int num_particles, int width, int height) {
 
   unsigned int vertexBufferObjID;
-  GLuint minitexid;
   glUseProgram(*shader);
   glGenVertexArrays(1, &(*vertexArrayObjID));
   glBindVertexArray(*vertexArrayObjID);
@@ -91,7 +89,7 @@ ObjectList* create_static_objects(TextureList* textures, ModelList* models)
   ObjectList* out_list = malloc(sizeof(ObjectList)+10*sizeof(WorldObject));
   out_list->obj_list[0] = new_object(textures->texture_list[0], models->model_list[0], T(0,10,10));
   out_list->obj_list[1] = new_object(textures->texture_list[0], models->model_list[1], T(0,0,10));
-  out_list->obj_list[2] = new_object(textures->texture_list[0], models->model_list[4], Mult(T(130,100,130),S(0.03, 0.03, 0.03)));
+  out_list->obj_list[2] = new_object(textures->texture_list[0], models->model_list[4], Mult(T(135,100,133),S(0.03, 0.03, 0.03)));
   out_list->size = 3;
   return out_list;
 }

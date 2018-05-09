@@ -109,14 +109,12 @@ vec3 rot = MultMat3Vec3(TransposeMat3(mat4tomat3(*worldToViewMatrix)),direction)
 		*cam_pos = SetVector(cam_pos->x +a*rot.x,cam_pos->y + a*rot.y,cam_pos->z + a*rot.z);//- b*v.x, cam_pos.y, cam_pos.z+b*v.z);
 		*cam_dir = SetVector(cam_dir->x +a*rot.x,cam_dir->y + a*rot.y,cam_dir->z + a*rot.z);
 		*worldToViewMatrix = lookAt(cam_pos->x,cam_pos->y,cam_pos->z, cam_dir->x,cam_dir->y,cam_dir->z,0,1,0);
-		printf("cam_pos = %f %f %f\n", cam_pos->x, cam_pos->y, cam_pos->z);
 	}
 	else {
 		vec3 transvec = translate(cam_pos->x, cam_pos->y, cam_pos->z, &ttex);
 		*cam_pos = SetVector(cam_pos->x +a*rot.x,55 + cam_pos->y - transvec.y ,cam_pos->z + a*rot.z);
 		*cam_dir = SetVector(cam_dir->x +a*rot.x,55 + cam_dir->y - transvec.y ,cam_dir->z + a*rot.z);
 		*worldToViewMatrix = lookAt(cam_pos->x,cam_pos->y,cam_pos->z, cam_dir->x,cam_dir->y,cam_dir->z,0,1,0);
-		printf("cam_pos = %f %f %f\n", cam_pos->x, cam_pos->y, cam_pos->z);
 	}
 
 	glutPostRedisplay();

@@ -30,10 +30,10 @@ void main()
 	temp = gl_InstanceID / width;
 	v = floor(temp) / num_particles;
 
-	offset = texture(tex, vec2(u, v))*20; //12
+	offset = texture(tex, vec2(u, v))*30;
 
 	newpos[0] += offset.r;
-	newpos[1] += offset.g*15; // more offset in y
+	newpos[1] += offset.g*20; // more offset in y
 	newpos[2] += offset.b;
 
 	newpos[1] -= speed*time;
