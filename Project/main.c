@@ -19,7 +19,7 @@ vec3 cam_pos,cam_dir,cam_speed;
 GLint prevx,prevy;
 
 //Initialize Shading stuff
-GLuint basic_shading, skybox_shading, advanced_shading, splat_shading, particle_shading, torch_flag=0, on_ground = 0;
+GLuint basic_shading, skybox_shading, advanced_shading, splat_shading, particle_shading, torch_flag=0, on_ground = 0, in_cave = 0;
 //Initialize Model stuff
 //Make objects instead
 TerrainObject *terrain_l,*terrain_h;
@@ -98,7 +98,7 @@ void display(void)
 	mat4 pos;
 	pos = T(125,50,125);
 	t += 0.1;
-	
+
 	//Bind om texturen!
 	render_particles(&pos, &worldToViewMatrix, &projectionMatrix, &particle_shading, &particleVAO, num_particles, width, height, t);
 
@@ -119,7 +119,7 @@ void mouseDraggedfunc(int x, int y)
 
 void keyboardfunc(unsigned char c, int x, int y)
 {
-  keyboard(c, x, y, &worldToViewMatrix, &cam_pos, &cam_dir, &torch_flag, &on_ground);
+  keyboard(c, x, y, &worldToViewMatrix, &cam_pos, &cam_dir, &torch_flag, &on_ground, &in_cave);
 }
 
 int main(int argc, char **argv)
