@@ -15,8 +15,8 @@ void camera_init(vec3 *cam_pos,vec3 *cam_dir,mat4 *projectionMatrix,mat4 *worldT
 	*projectionMatrix = frustum(-0.16, 0.16, -0.09, 0.09, 0.2, 1000.0);
 	LoadTGATextureData("Textures/above_terrain.tga", &above_tex);
 	LoadTGATextureData("Textures/preliminary_cave_design3.tga", &cave_tex);
-	portal_cave = SetVector(251, 25, 251); //x coord , radius, z coord of center of portal
-	portal_above = SetVector(35, 60, 35); //where to land in the above
+	portal_cave = SetVector(248, 25, 248); //x coord , radius, z coord of center of portal
+	portal_above = SetVector(35, 53, 35); //where to land in the above
 }
 
 vec3 translate(double x, double y, double z, TextureData *tex, int height_scale, int ytrans)
@@ -126,14 +126,14 @@ void keyboard(unsigned char c, int x, int y, mat4* worldToViewMatrix, vec3* cam_
 	else if (*in_cave == 1)
 	{
 		vec3 transvec = translate(cam_pos->x, cam_pos->y, cam_pos->z, &cave_tex, -100,1); //following ground in cave
-		printf("Nu är vi här\n");
-		printf("ny y%f\n",(cam_pos->y+a*rot.y-transvec.y));
+		//printf("Nu är vi här\n");
+		//printf("ny y%f\n",(cam_pos->y+a*rot.y-transvec.y));
 		if ((cam_pos->y+a*rot.y-transvec.y) < -0.2 )
 		{
 			*cam_pos = SetVector(cam_pos->x+a*rot.x,cam_pos->y +a*rot.y- transvec.y ,cam_pos->z +a*rot.z); //add 55 since above terrain is translated 50
 			*cam_dir = SetVector(cam_dir->x +a*rot.x,cam_dir->y - transvec.y ,cam_dir->z + a*rot.z);
 			*worldToViewMatrix = lookAt(cam_pos->x,cam_pos->y,cam_pos->z, cam_dir->x,cam_dir->y,cam_dir->z,0,1,0);
-			printf("Nu är vi inne i loopen \n");
+			//printf("Nu är vi inne i loopen \n");
 		}
 		else
 		{
@@ -142,18 +142,22 @@ void keyboard(unsigned char c, int x, int y, mat4* worldToViewMatrix, vec3* cam_
 			*worldToViewMatrix = lookAt(cam_pos->x,cam_pos->y,cam_pos->z, cam_dir->x,cam_dir->y,cam_dir->z,0,1,0);
 		}
 
-
-		printf("cam_pos.x = %f, cam_pos.y = %f, cam_pos.z = %f\n", cam_pos->x, cam_pos->y, cam_pos->z);
-	}
-
-	else {
 		if ((pow((cam_pos->x+a*rot.x - portal_cave.x), 2) + pow(cam_pos->z + a*rot.z - portal_cave.z, 2)) < portal_cave.y && teleported == false)
 		{
 			*cam_pos = SetVector(portal_above.x,portal_above.y,portal_above.z);
 			*cam_dir = SetVector(portal_above.x,portal_above.y,10);
 			*worldToViewMatrix = lookAt(cam_pos->x,cam_pos->y,cam_pos->z, cam_dir->x,cam_dir->y,cam_dir->z,0,1,0);
 			 teleported = true;
+			 *in_cave = 0;
+			 *on_ground = 1;
+			 printf("cave: %d\n", *in_cave);
 		}
+
+		//printf("cam_pos.x = %f, cam_pos.y = %f, cam_pos.z = %f\n", cam_pos->x, cam_pos->y, cam_pos->z);
+	}
+
+	else {
+
 	 //*cam_speed = SetVector(cam_speed->x +a*rot.x,cam_speed->y + a*rot.y,cam_speed->z + a*rot.z);
 	 *cam_pos = SetVector(cam_pos->x +a*rot.x,cam_pos->y + a*rot.y,cam_pos->z + a*rot.z);//- b*v.x, cam_pos.y, cam_pos.z+b*v.z);
 	 *cam_dir = SetVector(cam_dir->x +a*rot.x,cam_dir->y + a*rot.y,cam_dir->z + a*rot.z);
