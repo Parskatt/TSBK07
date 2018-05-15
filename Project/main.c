@@ -76,7 +76,7 @@ void display(void)
 {
 	//Check if a torch should be added
 	if(torch_flag){
-		append_ptlight(lights,make_point_light(cam_pos,0.3,0.5,0.8,SetVector(1,0.5,0),SetVector(1,0.5,0),SetVector(1,0.5,0)));
+		append_ptlight(lights,make_point_light(cam_pos,1,0.1,0.8,SetVector(1,0.5,0),SetVector(1,0.5,0),SetVector(1,0.5,0)));
 		add_torch(torches,textures,models, cam_pos);
 		torch_flag = 0;
 	}
@@ -86,7 +86,6 @@ void display(void)
 	render_skybox(skybox, worldToViewMatrix, &projectionMatrix, &skybox_shading);
 	//Draw everything else, begin with applying lighting to shaders
 	apply_lighting(lights, &advanced_shading, cam_pos);
-
 	apply_lighting(lights, &splat_shading, cam_pos);
 	apply_lighting(lights, &particle_shading, cam_pos);
 	render_terrain(terrain_l, &worldToViewMatrix, &projectionMatrix, &advanced_shading);

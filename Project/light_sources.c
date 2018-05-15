@@ -29,10 +29,10 @@ LightSources* lighting_hell(){
   lights->num_of_ptlights = 12;
   //Pos constant, linear, quadratic, ambient, diffuse, specular
   for(int n = 0; n < lights->num_of_ptlights; ++n){
-    lights->pointlights[n] = *make_point_light(SetVector(100.0,0.0,0.0),1.0,0.2,0.8,
-                              SetVector(0,0,0),SetVector(0,0,0),SetVector(0.0,0.0,0.0));//Magenta light
+    lights->pointlights[n] = *make_point_light(SetVector(124.0,49.0,124.0),0.1,0.2,0.8,
+                              SetVector(1.0,0.4,0.0),SetVector(1.0,0.4,0.0),SetVector(1.0,0.4,0.0));//Magenta light
   }
-  lights->dirlight = *make_dir_light(SetVector(1.0,1.0,1.0),SetVector(0.5,0.5,0.5),SetVector(0.0,0.0,0.0),SetVector(0.0,0.0,0.0)); //White light
+  lights->dirlight = *make_dir_light(SetVector(0.0,-1.0,0.0),SetVector(0.15,0.15,0.15),SetVector(0.3,0.3,0.4),SetVector(0.0,0.0,0.0)); //White light
 
   return lights;
 }
@@ -69,7 +69,7 @@ LightSources* find_closest_lights(LightSources* lights, LightSources* nearest, i
      nearest->pointlights[n] = lights->pointlights[n];
    }
    nearest->num_of_ptlights = num_of_lights;
-   nearest->dirlight = *make_dir_light(SetVector(1.0,1.0,1.0),SetVector(1,1,1),SetVector(0.0,0.0,0.0),SetVector(0.0,0.0,0.0)); //White light
+   nearest->dirlight = *make_dir_light(SetVector(1.0,1.0,1.0),SetVector(0.1,0.1,0.1),SetVector(0.0,0.0,0.0),SetVector(0.0,0.0,0.0)); //Redish light
    return nearest;                                                   //change here
 }
 void apply_lighting(LightSources* lights, GLuint* shader, vec3 cam_pos){
@@ -77,7 +77,7 @@ void apply_lighting(LightSources* lights, GLuint* shader, vec3 cam_pos){
   glUseProgram(*shader);
   glUniform3fv(glGetUniformLocation(*shader, "viewPos"),1,&cam_pos.x);
   LightSources* closest_lights = malloc(sizeof(LightSources)+12*sizeof(PointLight));;
-  closest_lights->num_of_ptlights = 12;//Here we have specified 4 lights, could do more if we want to, however we would have to change the shader
+  closest_lights->num_of_ptlights = 12;//Here we have specified 12 lights, could do more if we want to, however we would have to change the shader
   find_closest_lights(lights,closest_lights,closest_lights->num_of_ptlights,cam_pos);
   for (int i = 0; i < closest_lights->num_of_ptlights; i++)
   {
@@ -92,7 +92,7 @@ void apply_lighting(LightSources* lights, GLuint* shader, vec3 cam_pos){
     sprintf(buffer, "pointLights[%i].linear", i);
     glUniform1f(glGetUniformLocation(*shader, buffer), closest_lights->pointlights[i].linear);
 
-    sprintf(buffer, "pointLights[%i].qaudratic", i);
+    sprintf(buffer, "pointLights[%i].quadratic", i);
     glUniform1f(glGetUniformLocation(*shader, buffer), closest_lights->pointlights[i].quadratic);
 
     sprintf(buffer, "pointLights[%i].ambient", i);

@@ -44,7 +44,7 @@ vec3 CalcDirLight(DirLight light, vec3 normal, vec3 viewDir)
     vec3 reflectDir = reflect(-lightDir, normal);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 100.0);//Shininess
     // combine results
-    return (light.ambient + light.diffuse*diff + light.specular*spec);
+    return (light.ambient);// To remove diffuse part, kinda shitty solution lol + light.diffuse*diff + light.specular*spec);
 }
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 SurfPos, vec3 viewDir)
@@ -57,7 +57,7 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 SurfPos, vec3 viewDir)
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 1.0);//shininess
     // attenuation
     float distance    = length(light.position - SurfPos);
-    float attenuation = 10.0 / (light.constant + light.linear * distance +light.quadratic * (distance * distance));
+    float attenuation = 1.0 / (light.constant + light.linear * distance +light.quadratic * (distance * distance));
     // combine results
     return attenuation*(light.ambient + light.diffuse*diff + light.specular*spec);
 }
