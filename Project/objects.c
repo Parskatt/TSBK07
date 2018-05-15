@@ -1,5 +1,5 @@
 #include "objects.h"
-
+#define pi 3.1415926
 WorldObject* new_object(GLuint tex_id, Model* model, mat4 pos) {
   WorldObject* p = malloc(sizeof(WorldObject));
   p->texture_id = tex_id;
@@ -90,7 +90,8 @@ ObjectList* create_static_objects(TextureList* textures, ModelList* models)
   out_list->obj_list[0] = new_object(textures->texture_list[0], models->model_list[0], T(0,10,10));
   out_list->obj_list[1] = new_object(textures->texture_list[0], models->model_list[1], T(0,0,10));
   out_list->obj_list[2] = new_object(textures->texture_list[3], models->model_list[4], Mult(T(135,100,133),S(0.03, 0.03, 0.03)));
-  out_list->obj_list[3] = new_object(textures->texture_list[3], models->model_list[5], T(222,0,228));
+  vec3 ring_pos = SetVector(222,0,228);
+  out_list->obj_list[3] = new_object(textures->texture_list[3], models->model_list[5], T(222,0,228));//ArbRigid(SetVector(0,1,0),pi/6,ring_pos));
   out_list->size = 4;
   return out_list;
 }
@@ -111,21 +112,11 @@ void add_torch(ObjectList* objects, TextureList* textures, ModelList* models, ve
 
 void render_objects(ObjectList* objects, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader, int remove_object)
 {
-  int i;
-  if (remove_object)
+  for(int i=0; i<(objects->size-remove_object); i++)//remove_object insert here
   {
-    for(i=0; i<(objects->size-1); i++)
-    {
-      render_object(objects->obj_list[i], worldToViewMatrix, projectionMatrix, shader);
-    }
+    render_object(objects->obj_list[i], worldToViewMatrix, projectionMatrix, shader);
   }
-  else
-  {
-    for (i=0; i<objects->size; i++)
-    {
-        render_object(objects->obj_list[i], worldToViewMatrix, projectionMatrix, shader);
-    }
-  }
+
 }
 
 

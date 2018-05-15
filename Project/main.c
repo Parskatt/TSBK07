@@ -16,10 +16,11 @@
 //"Globals"
 mat4 projectionMatrix, worldToViewMatrix, modelToWorldMatrix, totMatrix;
 vec3 cam_pos,cam_dir,cam_speed;
+vec3 ring_pos,doom_pos;
 GLint prevx,prevy;
 
 //Initialize Shading stuff
-GLuint basic_shading, skybox_shading, advanced_shading, splat_shading, particle_shading, torch_flag=0, on_ground = 0, in_cave = 0;
+GLuint basic_shading, skybox_shading, advanced_shading, splat_shading, particle_shading, torch_flag=0, on_ground = 0, in_cave = 0, has_ring = 0;
 //Initialize Model stuff
 //Make objects instead
 TerrainObject *terrain_l,*terrain_h;
@@ -41,7 +42,7 @@ void init(void)
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 	printError("GL inits");
-
+	doom_pos = SetVector(114,74,124);
 	//Load Shaders
 	load_shaders(&basic_shading,&skybox_shading, &advanced_shading, &splat_shading, &particle_shading);	// Load and compile shader
 	//Camera init
@@ -61,6 +62,7 @@ void init(void)
 	terrain_above = new_splat("Textures/lava.tga","Textures/grass.tga","Textures/berg2.tga", "Textures/above_terrain.tga", "Textures/map.tga", T(0,50,0), 10);
 
 	//Create objects
+	ring_pos = SetVector(222,0,228);
 	created_static_objects = create_static_objects(textures,models);
 	torches = create_torch_objects();
 	init_particles(&particle_shading, &particleVAO, num_particles, width, height);
@@ -80,6 +82,13 @@ void display(void)
 		add_torch(torches,textures,models, cam_pos);
 		torch_flag = 0;
 	}
+	if(distance(ring_pos,cam_pos) < 3.0){
+		has_ring = 1;
+	}
+	if(has_ring && distance(cam_pos,doom_pos) < 3.0 ){
+		printf("\r Congratulations!");
+	}
+	//printf("\r has_ring: %f %f %f",cam_pos.x,cam_pos.y,cam_pos.z);
 	// clear the screen
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//Draw the skybox
@@ -91,7 +100,7 @@ void display(void)
 	render_terrain(terrain_l, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	render_terrain(terrain_h, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	render_splat(terrain_above, &worldToViewMatrix, &projectionMatrix, &splat_shading);
-	render_objects(created_static_objects, &worldToViewMatrix, &projectionMatrix, &advanced_shading,0);
+	render_objects(created_static_objects, &worldToViewMatrix, &projectionMatrix, &advanced_shading,has_ring);
 	render_objects(torches, &worldToViewMatrix, &projectionMatrix, &advanced_shading,0);
 
 	mat4 pos;
