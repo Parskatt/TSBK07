@@ -90,7 +90,7 @@ ObjectList* create_static_objects(TextureList* textures, ModelList* models)
   out_list->obj_list[0] = new_object(textures->texture_list[0], models->model_list[0], T(0,10,10));
   out_list->obj_list[1] = new_object(textures->texture_list[0], models->model_list[1], T(0,0,10));
   out_list->obj_list[2] = new_object(textures->texture_list[3], models->model_list[4], Mult(T(135,100,133),S(0.03, 0.03, 0.03)));
-  out_list->obj_list[3] = new_object(textures->texture_list[3], models->model_list[5], T(0,0,-10));
+  out_list->obj_list[3] = new_object(textures->texture_list[3], models->model_list[5], T(222,0,228));
   out_list->size = 4;
   return out_list;
 }
@@ -109,17 +109,22 @@ void add_torch(ObjectList* objects, TextureList* textures, ModelList* models, ve
   objects->size = objects->size + 2;
 }
 
-void render_objects(ObjectList* objects, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader)
+void render_objects(ObjectList* objects, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader, int remove_object)
 {
   int i;
-  //sizeof(a)/sizeof(a[0])
-  //sizeof(objects->obj_list)/sizeof(objects->obj_list[0])
-  //sizeof ger antal bytes, ex int-list ger 4 per byte, så delar på index0 (antal bytes per element)
-  //TODO: Går det att använda detta för worldObj-pekare? Eller behövs en annan lista?
-  //printf("Number of elements :%d", sizeof(objects->obj_list)/sizeof(objects->obj_list[0]));
-  for (i=0; i<objects->size; i++)
+  if (remove_object)
   {
+    for(i=0; i<(objects->size-1); i++)
+    {
       render_object(objects->obj_list[i], worldToViewMatrix, projectionMatrix, shader);
+    }
+  }
+  else
+  {
+    for (i=0; i<objects->size; i++)
+    {
+        render_object(objects->obj_list[i], worldToViewMatrix, projectionMatrix, shader);
+    }
   }
 }
 

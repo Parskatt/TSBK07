@@ -91,8 +91,8 @@ void display(void)
 	render_terrain(terrain_l, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	render_terrain(terrain_h, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
 	render_splat(terrain_above, &worldToViewMatrix, &projectionMatrix, &splat_shading);
-	render_objects(created_static_objects, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
-	render_objects(torches, &worldToViewMatrix, &projectionMatrix, &advanced_shading);
+	render_objects(created_static_objects, &worldToViewMatrix, &projectionMatrix, &advanced_shading,0);
+	render_objects(torches, &worldToViewMatrix, &projectionMatrix, &advanced_shading,0);
 
 	mat4 pos;
 	pos = T(125,50,125);

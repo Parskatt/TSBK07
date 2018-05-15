@@ -47,7 +47,7 @@ void render_object(WorldObject* object, mat4* worldToViewMatrix, mat4* projectio
 ObjectList* create_static_objects(TextureList* textures, ModelList* models);
 ObjectList* create_torch_objects();
 void add_torch(ObjectList* objects, TextureList* textures, ModelList* models, vec3 cam_pos);
-void render_objects(ObjectList* objects, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader);
+void render_objects(ObjectList* objects, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader, int remove_object);
 void render_particles(mat4* pos, mat4* worldToViewMatrix, mat4* projectionMatrix, GLuint* shader, unsigned int *vertexArrayObjID, int num_particles, int width, int height, GLfloat t);
 void init_particles(GLuint* shader, unsigned int *vertexArrayObjID, int num_particles, int width, int height);
 ModelList* load_models();
