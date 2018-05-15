@@ -110,6 +110,7 @@ extern "C" {
 	mat4 ArbRotate(vec3 axis, GLfloat fi);
 	mat4 CrossMatrix(vec3 a);
 	mat4 MatrixAdd(mat4 a, mat4 b);
+	mat4 ArbRigid(vec3 axis,GLfloat fi, vec3 t);
 
 // Configure, i.e. if you want matrices to be column-wise
 	void SetTransposed(char t);

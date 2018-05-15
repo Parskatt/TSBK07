@@ -616,7 +616,11 @@ mat4 ArbRotate(vec3 axis, GLfloat fi)
 
 	return m;
 }
-
+mat4 ArbRigid(vec3 axis,GLfloat fi, vec3 t){
+  mat4 Rt;
+  Rt = MatrixAdd(ArbRotate(axis,fi),T(t.x,t.y,t.z));
+  return Rt;
+}
 
 
 
