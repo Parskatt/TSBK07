@@ -89,8 +89,9 @@ ObjectList* create_static_objects(TextureList* textures, ModelList* models)
   ObjectList* out_list = malloc(sizeof(ObjectList)+10*sizeof(WorldObject));
   out_list->obj_list[0] = new_object(textures->texture_list[0], models->model_list[0], T(0,10,10));
   out_list->obj_list[1] = new_object(textures->texture_list[0], models->model_list[1], T(0,0,10));
-  out_list->obj_list[2] = new_object(textures->texture_list[0], models->model_list[4], Mult(T(135,100,133),S(0.03, 0.03, 0.03)));
-  out_list->size = 3;
+  out_list->obj_list[2] = new_object(textures->texture_list[3], models->model_list[4], Mult(T(135,100,133),S(0.03, 0.03, 0.03)));
+  out_list->obj_list[3] = new_object(textures->texture_list[3], models->model_list[5], T(0,0,-10));
+  out_list->size = 4;
   return out_list;
 }
 
@@ -131,9 +132,10 @@ ModelList* load_models()
   out_list->model_list[2] = LoadModelPlus("Models/torch1.obj");
   out_list->model_list[3] = LoadModelPlus("Models/torch2.obj");
   out_list->model_list[4] = LoadModelPlus("Models/cloud.obj");
+  out_list->model_list[5] = LoadModelPlus("Models/torus.obj");
 
 
-  out_list->size = 5;
+  out_list->size = 6;
   return out_list;
 }
 
@@ -151,7 +153,8 @@ TextureList* load_textures()
   LoadTGATextureSimple("Textures/maskros512.tga", &out_list->texture_list[0]);
   LoadTGATextureSimple("Textures/lava.tga", &out_list->texture_list[1]);
   LoadTGATextureSimple("Textures/kt_rock_1f_dk.tga", &out_list->texture_list[2]);
+  LoadTGATextureSimple("Textures/moln.tga", &out_list->texture_list[3]);
 
-  out_list->size = 3;
+  out_list->size = 4;
   return out_list;
 }
