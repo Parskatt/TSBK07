@@ -29,10 +29,10 @@ LightSources* lighting_hell(){
   lights->num_of_ptlights = 12;
   //Pos constant, linear, quadratic, ambient, diffuse, specular
   for(int n = 0; n < lights->num_of_ptlights; ++n){
-    lights->pointlights[n] = *make_point_light(SetVector(124.0,49.0,124.0),0.1,0.2,0.8,
+    lights->pointlights[n] = *make_point_light(SetVector(124.0,49.0,124.0),0.1,0.02,0.08,
                               SetVector(1.0,0.4,0.0),SetVector(1.0,0.4,0.0),SetVector(1.0,0.4,0.0));//Magenta light
   }
-  lights->dirlight = *make_dir_light(SetVector(0.0,-1.0,0.0),SetVector(0.15,0.15,0.15),SetVector(0.3,0.3,0.4),SetVector(0.0,0.0,0.0)); //White light
+  lights->dirlight = *make_dir_light(SetVector(0.0,-1.0,0.0),SetVector(0.40,0.25,0.25),SetVector(0.3,0.3,0.4),SetVector(0.0,0.0,0.0)); //White light
 
   return lights;
 }

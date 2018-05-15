@@ -80,7 +80,7 @@ void keyboard(unsigned char c, int x, int y, mat4* worldToViewMatrix, vec3* cam_
 	case 'f': //For fullscreen
 		glutToggleFullScreen();
 		break;
-	case 'l':
+	case 32:
 		*torch_flag = 1;
 		break;
 	case 'c':

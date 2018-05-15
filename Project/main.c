@@ -76,7 +76,7 @@ void display(void)
 {
 	//Check if a torch should be added
 	if(torch_flag){
-		append_ptlight(lights,make_point_light(cam_pos,1,0.1,0.8,SetVector(1,0.5,0),SetVector(1,0.5,0),SetVector(1,0.5,0)));
+		append_ptlight(lights,make_point_light(cam_pos,0.5,0.01,0.02,SetVector(1.0,0.5,0),SetVector(1,0.5,0),SetVector(1,0.5,0)));
 		add_torch(torches,textures,models, cam_pos);
 		torch_flag = 0;
 	}
