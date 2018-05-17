@@ -58,7 +58,7 @@ vec3 translate(double x, double y, double z, TextureData *tex, int height_scale,
 
 void keyboard(unsigned char c, int x, int y, mat4* worldToViewMatrix, vec3* cam_pos, vec3* cam_dir, GLuint* torch_flag, GLuint* on_ground, GLuint* in_cave)
 {
-	static float a = 0.5;
+	static float a = 0.25;
 	vec3 direction = SetVector(0,0,0);
 	switch (c)
 	{
@@ -114,7 +114,7 @@ void keyboard(unsigned char c, int x, int y, mat4* worldToViewMatrix, vec3* cam_
 	vec3 rot = MultMat3Vec3(TransposeMat3(mat4tomat3(*worldToViewMatrix)),direction);
 
 	 if (*on_ground == 1) {
-		 vec3 transvec = translate(cam_pos->x+a*rot.x, cam_pos->y+a*rot.y, cam_pos->z+a*rot.y, &above_tex, 10, 51); //following ground in the above world
+		 vec3 transvec = translate(cam_pos->x+a*rot.x, cam_pos->y+a*rot.y, cam_pos->z+a*rot.y, &above_tex, 10, 52); //following ground in the above world
 		 if ((cam_pos->y - cam_pos->y+a*rot.y-transvec.y) < 5 && (cam_pos->y - cam_pos->y+a*rot.y-transvec.y) > -5)
 		 {
 			 *cam_pos = SetVector(cam_pos->x+a*rot.x,cam_pos->y +a*rot.y- transvec.y ,cam_pos->z +a*rot.z); //add 55 since above terrain is translated 50
@@ -153,7 +153,7 @@ void keyboard(unsigned char c, int x, int y, mat4* worldToViewMatrix, vec3* cam_
 			 printf("cave: %d\n", *in_cave);
 		}
 
-
+		//printf("cam_pos.x = %f, cam_pos.y = %f, cam_pos.z = %f\n", cam_pos->x, cam_pos->y, cam_pos->z);
 	}
 
 	else {
@@ -163,7 +163,7 @@ void keyboard(unsigned char c, int x, int y, mat4* worldToViewMatrix, vec3* cam_
 	 *cam_dir = SetVector(cam_dir->x +a*rot.x,cam_dir->y + a*rot.y,cam_dir->z + a*rot.z);
 	 *worldToViewMatrix = lookAt(cam_pos->x,cam_pos->y,cam_pos->z, cam_dir->x,cam_dir->y,cam_dir->z,0,1,0);
 	}
-	//printf("\r cam_pos.x = %f, cam_pos.y = %f, cam_pos.z = %f", cam_pos->x, cam_pos->y, cam_pos->z);
+
 	glutPostRedisplay();
 }
 

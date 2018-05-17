@@ -90,7 +90,6 @@ ObjectList* create_static_objects(TextureList* textures, ModelList* models)
   out_list->obj_list[0] = new_object(textures->texture_list[0], models->model_list[0], T(0,10,10));
   out_list->obj_list[1] = new_object(textures->texture_list[0], models->model_list[1], T(0,0,10));
   out_list->obj_list[2] = new_object(textures->texture_list[3], models->model_list[4], Mult(T(135,100,133),S(0.03, 0.03, 0.03)));
-  vec3 ring_pos = SetVector(222,0,228);
   out_list->obj_list[3] = new_object(textures->texture_list[3], models->model_list[5], T(222,0,228));//ArbRigid(SetVector(0,1,0),pi/6,ring_pos));
   out_list->size = 4;
   return out_list;

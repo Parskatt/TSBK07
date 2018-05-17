@@ -1,6 +1,8 @@
 #ifdef __APPLE__
 	#include <OpenGL/gl3.h>
 #endif
+#include <stdio.h>
+#include <stdlib.h>
 #include "MicroGlut.h"
 #include "GL_utilities.h"
 #include "VectorUtils3.h"
@@ -20,7 +22,7 @@ vec3 ring_pos,doom_pos;
 GLint prevx,prevy;
 
 //Initialize Shading stuff
-GLuint basic_shading, skybox_shading, advanced_shading, splat_shading, particle_shading, torch_flag=0, on_ground = 0, in_cave = 0, has_ring = 0;
+GLuint basic_shading, skybox_shading, advanced_shading, splat_shading, particle_shading, torch_flag=0, on_ground = 0, in_cave = 1, has_ring = 0;
 //Initialize Model stuff
 //Make objects instead
 TerrainObject *terrain_l,*terrain_h;
@@ -67,6 +69,7 @@ void init(void)
 	torches = create_torch_objects();
 	init_particles(&particle_shading, &particleVAO, num_particles, width, height);
 	glutPostRedisplay();
+	system("clear");
 }
 
 void timer(int i)
@@ -76,6 +79,7 @@ void timer(int i)
 
 void display(void)
 {
+
 	//Check if a torch should be added
 	if(torch_flag){
 		append_ptlight(lights,make_point_light(cam_pos,0.5,0.01,0.02,SetVector(1.0,0.5,0),SetVector(1,0.5,0),SetVector(1,0.5,0)));
@@ -86,7 +90,9 @@ void display(void)
 		has_ring = 1;
 	}
 	if(has_ring && distance(cam_pos,doom_pos) < 3.0 ){
-		printf("\r Congratulations!");
+		system("clear");
+		printf("\n***Congratulations!****\n");
+		exit(0);
 	}
 	//printf("\r has_ring: %f %f %f",cam_pos.x,cam_pos.y,cam_pos.z);
 	// clear the screen
